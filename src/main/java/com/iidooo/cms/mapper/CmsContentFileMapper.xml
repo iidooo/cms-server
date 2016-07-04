@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.iidooo.cms.mapper.CmsContentFileMapper" >
+  <resultMap id="BaseResultMap" type="com.iidooo.cms.model.po.CmsContentFile" >
+    <id column="ContentID" property="contentID" jdbcType="INTEGER" />
+    <result column="ChannelID" jdbcType="INTEGER" property="channelID" />
+		<result column="ContentType" jdbcType="VARCHAR" property="contentType" />
+		<result column="ContentTitle" jdbcType="VARCHAR" property="contentTitle" />
+		<result column="ContentSubTitle" jdbcType="VARCHAR" property="contentSubTitle" />
+		<result column="ContentImageTitle" jdbcType="VARCHAR" property="contentImageTitle" />
+		<result column="MetaTitle" jdbcType="VARCHAR" property="metaTitle" />
+		<result column="MetaKeywords" jdbcType="VARCHAR" property="metaKeywords" />
+		<result column="MetaDescription" jdbcType="VARCHAR" property="metaDescription" />
+		<result column="ContentSummary" jdbcType="VARCHAR" property="contentSummary" />
+		<result column="IsSilent" jdbcType="INTEGER" property="isSilent" />
+		<result column="StickyIndex" jdbcType="INTEGER" property="stickyIndex" />
+		<result column="PageViewCount" jdbcType="INTEGER" property="pageViewCount" />
+		<result column="UniqueVisitorCount" jdbcType="INTEGER" property="uniqueVisitorCount" />
+		<result column="StarCount" jdbcType="INTEGER" property="starCount" />
+		<result column="CommentCount" jdbcType="INTEGER" property="commentCount" />
+		<result column="StartShowDate" property="startShowDate" jdbcType="VARCHAR" />
+		<result column="StartShowTime" property="startShowTime" jdbcType="VARCHAR" />
+		<result column="EndShowDate" property="endShowDate" jdbcType="VARCHAR" />
+		<result column="EndShowTime" property="endShowTime" jdbcType="VARCHAR" />
+		<result column="Status" property="status" jdbcType="VARCHAR" />
+		<result column="Remarks" jdbcType="VARCHAR" property="remarks" />
+		<result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="CreateUserID" jdbcType="INTEGER" property="createUserID" />
+		<result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
+		<result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID" />
+		<result column="IsDelete" jdbcType="INTEGER" property="isDelete" />
+		<result column="Version" jdbcType="INTEGER" property="version" />
+    <result column="FileURL" property="fileURL" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    F.ContentID, C.ChannelID, C.ContentType, C.ContentTitle, C.ContentSubTitle, C.ContentImageTitle,
+		C.MetaTitle, C.MetaKeywords,
+		C.MetaDescription, C.ContentSummary, C.IsSilent, C.StickyIndex, C.PageViewCount,
+		C.UniqueVisitorCount, C.StarCount, C.CommentCount, C.StartShowDate,
+		C.StartShowTime,
+		C.EndShowDate, C.EndShowTime, C.Status, C.Remarks, C.CreateTime, C.CreateUserID, C.UpdateTime, C.UpdateUserID,
+		C.IsDelete, C.Version, 
+		F.FileURL
+  </sql>
+  
+  <!-- 根据栏目路径查询获得内容一览数目 -->
+	<select id="selectContentListCount" resultType="java.lang.Integer">
+		select
+		count(C.ContentID)
+		from cms_content C
+		join cms_content_file F
+		join cms_channel L 
+		join cms_site S on
+		C.IsDelete = 0 and C.Status = '0' and C.ContentID = F.ContentID and 
+		L.IsDelete = 0 and C.ChannelID = L.ChannelID and 
+		S.IsDelete = 0 and S.SiteID = L.SiteID
+		and S.SiteCode = #{channel.site.siteCode,jdbcType=VARCHAR}
+		and L.ChannelPath =	#{channel.channelPath,jdbcType=VARCHAR}
+	</select>
+
+	<!-- 根据栏目路径查询获得内容一览 -->
+	<select id="selectContentList" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from cms_content C
+		join cms_content_file F
+		join cms_channel L 
+		join cms_site S on
+		C.IsDelete = 0 and C.Status = '0' and C.ContentID = F.ContentID and 
+		L.IsDelete = 0 and C.ChannelID = L.ChannelID and 
+		S.IsDelete = 0 and S.SiteID = L.SiteID
+		and S.SiteCode = #{content.channel.site.siteCode,jdbcType=VARCHAR}
+		and L.ChannelPath =	#{content.channel.channelPath,jdbcType=VARCHAR}
+		order by C.StickyIndex desc, C.${page.sortField} ${page.sortType} limit ${page.start}, ${page.pageSize}
+	</select>
+	
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from cms_content_file
+    where ContentID = #{contentID,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.iidooo.cms.model.po.CmsContentFile" >
+    insert into cms_content_file (ContentID, FileURL)
+    values (#{contentID,jdbcType=INTEGER}, #{fileURL,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.iidooo.cms.model.po.CmsContentFile" >
+    insert into cms_content_file
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="contentID != null" >
+        ContentID,
+      </if>
+      <if test="fileURL != null" >
+        FileURL,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="contentID != null" >
+        #{contentID,jdbcType=INTEGER},
+      </if>
+      <if test="fileURL != null" >
+        #{fileURL,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.iidooo.cms.model.po.CmsContentFile" >
+    update cms_content_file
+    <set >
+      <if test="fileURL != null" >
+        FileURL = #{fileURL,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ContentID = #{contentID,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.iidooo.cms.model.po.CmsContentFile" >
+    update cms_content_file
+    set FileURL = #{fileURL,jdbcType=VARCHAR}
+    where ContentID = #{contentID,jdbcType=INTEGER}
+  </update>
+</mapper>
