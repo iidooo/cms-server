@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.iidooo.cms.enums.TableName;
 import com.iidooo.cms.model.po.CmsCommentNotice;
 import com.iidooo.cms.service.CmsCommentNoticeService;
+import com.iidooo.core.constant.RegularConstant;
 import com.iidooo.core.enums.MessageLevel;
 import com.iidooo.core.enums.MessageType;
 import com.iidooo.core.enums.ResponseStatus;
@@ -45,7 +46,7 @@ public class CmsCommentNoticeController {
                 result.getMessages().add(message);
                 result.setStatus(ResponseStatus.Failed.getCode());
                 return result;
-            } else if (!ValidateUtil.isNumber(userID)) {
+            } else if (!ValidateUtil.isMatch(userID, RegularConstant.REGEX_NUMBER)) {
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "userID");
                 result.getMessages().add(message);
                 result.setStatus(ResponseStatus.Failed.getCode());
@@ -57,7 +58,7 @@ public class CmsCommentNoticeController {
                 result.getMessages().add(message);
                 result.setStatus(ResponseStatus.Failed.getCode());
                 return result;
-            } else if (!ValidateUtil.isNumber(commentID)) {
+            } else if (!ValidateUtil.isMatch(commentID, RegularConstant.REGEX_NUMBER)) {
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "commentID");
                 result.getMessages().add(message);
                 result.setStatus(ResponseStatus.Failed.getCode());
@@ -100,7 +101,7 @@ public class CmsCommentNoticeController {
                 result.getMessages().add(message);
                 result.setStatus(ResponseStatus.Failed.getCode());
                 return result;
-            } else if (!ValidateUtil.isNumber(userID)) {
+            } else if (!ValidateUtil.isMatch(userID, RegularConstant.REGEX_NUMBER)) {
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "userID");
                 result.getMessages().add(message);
                 result.setStatus(ResponseStatus.Failed.getCode());

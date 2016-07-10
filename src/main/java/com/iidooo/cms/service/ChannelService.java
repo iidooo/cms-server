@@ -6,4 +6,6 @@ import com.iidooo.cms.model.po.CmsChannel;
 
 public interface ChannelService {
     List<CmsChannel> getChannelList(String siteCode);
+    
+    List<CmsChannel> getChannelList(Integer siteID);
 }

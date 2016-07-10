@@ -23,6 +23,7 @@ import com.aliyun.oss.OSSClient;
 import com.iidooo.aliyun.util.OSSUtil;
 import com.iidooo.cms.enums.FileType;
 import com.iidooo.cms.service.UploadService;
+import com.iidooo.core.constant.RegularConstant;
 import com.iidooo.core.enums.MessageLevel;
 import com.iidooo.core.enums.MessageType;
 import com.iidooo.core.enums.ResponseStatus;
@@ -68,7 +69,7 @@ public class UploadController {
                 result.getMessages().add(message);
                 result.setStatus(ResponseStatus.Failed.getCode());
                 return result;
-            } else if (!ValidateUtil.isNumber(fileType)) {
+            } else if (!ValidateUtil.isMatch(fileType, RegularConstant.REGEX_NUMBER)) {
                 // 验证失败，返回message
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "fileType");
                 result.getMessages().add(message);

@@ -3,6 +3,7 @@
 <mapper namespace="com.iidooo.cms.mapper.CmsContentMapper">
 	<resultMap id="BaseResultMap" type="com.iidooo.cms.model.po.CmsContent">
 		<id column="ContentID" jdbcType="INTEGER" property="contentID" />
+		<result column="SiteID" jdbcType="INTEGER" property="siteID" />
 		<result column="ChannelID" jdbcType="INTEGER" property="channelID" />
 		<result column="ContentType" jdbcType="VARCHAR" property="contentType" />
 		<result column="ContentTitle" jdbcType="VARCHAR" property="contentTitle" />
@@ -29,12 +30,14 @@
 		<result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
 		<result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID" />
 		<result column="IsDelete" jdbcType="INTEGER" property="isDelete" />
-		<result column="Version" jdbcType="INTEGER" property="version" />		
+		<result column="Version" jdbcType="INTEGER" property="version" />	
+		<association select="selectCreateUser" column="createUserID" property="createUser" javaType="com.iidooo.core.model.po.SecurityUser"></association>
+		<association select="selectChannel" column="channelID" property="channel" javaType="com.iidooo.cms.model.po.CmsChannel"></association>		
 	</resultMap>
 	
 	<resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.iidooo.cms.model.po.CmsContent">
 		<result column="ContentBody" jdbcType="LONGVARCHAR" property="contentBody" />
-		<association select="selectCreateUser" column="createUserID" property="createUser" javaType="com.iidooo.core.model.po.SecurityUser"></association>
+		
 
 		<collection select="selectPictureList" column="contentID" property="pictureList" ofType="com.iidooo.cms.model.po.CmsPicture"></collection>
 		<collection select="selectTagList" column="contentID" property="tagList" ofType="com.iidooo.cms.model.vo.CmsTagInfo"></collection>
@@ -48,7 +51,7 @@
 	</resultMap>
 
 	<sql id="Base_Column_List">
-		C.ContentID, C.ChannelID, C.ContentType, C.ContentTitle, C.ContentSubTitle, C.ContentImageTitle,
+		C.ContentID, C.SiteID, C.ChannelID, C.ContentType, C.ContentTitle, C.ContentSubTitle, C.ContentImageTitle,
 		C.MetaTitle, C.MetaKeywords,
 		C.MetaDescription, C.ContentSummary, C.IsSilent, C.StickyIndex, C.PageViewCount,
 		C.UniqueVisitorCount, C.StarCount, C.CommentCount, C.StartShowDate,
@@ -69,7 +72,37 @@
 		U.CreateTime, U.CreateUserID, U.IsDelete, U.Version
 		from security_user U where UserID = #{createUserID,jdbcType=INTEGER}
 	</select>
-
+	
+	<!-- 查询所属栏目 -->
+	<resultMap id="ChannelResultMap" type="com.iidooo.cms.model.po.CmsChannel">
+		<id column="ChannelID" property="channelID" jdbcType="INTEGER" />
+		<result column="SiteID" property="siteID" jdbcType="INTEGER" />
+		<result column="ParentID" property="parentID" jdbcType="INTEGER" />
+		<result column="ChannelName" property="channelName" jdbcType="VARCHAR" />
+		<result column="ChannelPath" property="channelPath" jdbcType="VARCHAR" />
+		<result column="MetaTitle" property="metaTitle" jdbcType="VARCHAR" />
+		<result column="MetaKeywords" property="metaKeywords" jdbcType="VARCHAR" />
+		<result column="MetaDescription" property="metaDescription" jdbcType="VARCHAR" />
+		<result column="Sequence" property="sequence" jdbcType="INTEGER" />
+		<result column="Remarks" property="remarks" jdbcType="VARCHAR" />
+		<result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="CreateUserID" property="createUserID" jdbcType="INTEGER" />
+		<result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="UpdateUserID" property="updateUserID" jdbcType="INTEGER" />
+		<result column="IsDelete" property="isDelete" jdbcType="INTEGER" />
+		<result column="Version" property="version" jdbcType="INTEGER" />
+	</resultMap>
+	<sql id="Channel_Column_List">
+		L.ChannelID, L.SiteID, L.ParentID, L.ChannelName, L.ChannelPath, L.MetaTitle, L.MetaKeywords, L.MetaDescription,
+		L.Sequence, L.Remarks, L.CreateTime, L.CreateUserID, L.UpdateTime, L.UpdateUserID, L.IsDelete,
+		L.Version
+	</sql>
+	<select id="selectChannel" parameterType="java.lang.Integer" resultMap="ChannelResultMap">
+		select
+		<include refid="Channel_Column_List" />
+		from cms_channel L where L.ChannelID = #{channelID,jdbcType=INTEGER}
+	</select>
+	
 	<!-- 根据CmsContent表中的ContentID查询CmsTag信息 -->
 	<select id="selectTagList" parameterType="java.lang.Integer" resultMap="TagListResultMap">
 		select T.TagID, T.TagName, T.Remarks from cms_content_tag CT join
@@ -163,54 +196,61 @@
 		count(C.ContentID)
 		from cms_content C
 		where C.IsDelete = 0
-		<if test="cmsContent.channelID != null and cmsContent.channelID != 0">
-			and C.ChannelID = #{cmsContent.channelID,jdbcType=INTEGER}
+		<if test="siteID != null and siteID != 0">
+			and C.SiteID = #{siteID,jdbcType=INTEGER}
 		</if>
-		<if test="cmsContent.contentTitle != null and cmsContent.contentTitle != ''">
-			and C.ContentTitle like "%${cmsContent.contentTitle}%"
+		<if test="channelID != null and channelID != 0">
+			and C.ChannelID = #{channelID,jdbcType=INTEGER}
 		</if>
-		<if test="cmsContent.contentType != null and cmsContent.contentType != '' and cmsContent.contentType != 0">
-			and C.ContentType = #{cmsContent.contentType,jdbcType=VARCHAR}
+		<if test="contentTitle != null and contentTitle != ''">
+			and C.ContentTitle like "%${contentTitle}%"
 		</if>
-		<if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
-			and C.CreateTime &gt;= #{startDate}
-			and C.CreateTime &lt;= #{endDate}
+		<if test="contentType != null and contentType != ''">
+			and C.ContentType = #{contentType,jdbcType=VARCHAR}
 		</if>
-		<if test="cmsContent.status != null and cmsContent.status != ''">
-			and C.Status = #{cmsContent.status,jdbcType=VARCHAR}
+		<if test="startDateTime != null and startDateTime != ''">
+			and C.CreateTime &gt;= #{startDateTime}
 		</if>
-		<if test="cmsContent.createUserID != null and cmsContent.createUserID != 0">
-			and C.CreateUserID = #{cmsContent.createUserID,jdbcType=INTEGER}
+		<if test="endDateTime != null and endDateTime != ''">
+			and C.CreateTime &lt;= #{endDateTime}
+		</if>
+		<if test="contentStatus != null and contentStatus != ''">
+			and C.Status = #{contentStatus,jdbcType=VARCHAR}
+		</if>
+		<if test="createUserID != null and createUserID != 0">
+			and C.CreateUserID = #{createUserID,jdbcType=INTEGER}
 		</if>
 	</select>
 
 	<!-- 检索内容一览信息 -->
 	<select id="selectForSearch" resultMap="BaseResultMap">
 		select
-		<include refid="Base_Column_List" />,
-		<include refid="Blob_Column_List" />
+		<include refid="Base_Column_List" />
 		from cms_content C
 		where C.IsDelete = 0
-		<if test="cmsContent.channelID != null and cmsContent.channelID != 0">
-			and C.ChannelID = #{cmsContent.channelID,jdbcType=INTEGER}
+		<if test="condition.siteID != null and condition.siteID != 0">
+			and C.SiteID = #{condition.siteID,jdbcType=INTEGER}
 		</if>
-		<if test="cmsContent.contentTitle != null and cmsContent.contentTitle != ''">
-			and C.ContentTitle like "%${cmsContent.contentTitle}%"
+		<if test="condition.channelID != null and condition.channelID != 0">
+			and C.ChannelID = #{condition.channelID,jdbcType=INTEGER}
 		</if>
-		<if test="cmsContent.contentType != null and cmsContent.contentType != 0">
-			and C.ContentType = #{cmsContent.contentType,jdbcType=VARCHAR}
+		<if test="condition.contentTitle != null and condition.contentTitle != ''">
+			and C.ContentTitle like "%${condition.contentTitle}%"
 		</if>
-		<if test="startDate != null and startDate != ''">
-			and C.CreateTime &gt;= #{startDate}
+		<if test="condition.contentType != null and condition.contentType != ''">
+			and C.ContentType = #{condition.contentType,jdbcType=VARCHAR}
 		</if>
-		<if test="endDate != null and endDate != ''">
-			and C.CreateTime &lt;= #{endDate}
+		<if test="condition.startDateTime != null and condition.startDateTime != ''">
+			and C.CreateTime &gt;= #{condition.startDateTime}
 		</if>
-		<if test="cmsContent.status != null and cmsContent.status != ''">
-			and C.Status = #{cmsContent.status,jdbcType=VARCHAR}
+		<if test="condition.endDateTime != null and condition.endDateTime != ''">
+			and C.CreateTime &lt;= #{condition.endDateTime}
 		</if>
-		<if test="cmsContent.createUserID != null and cmsContent.createUserID != 0">
-			and C.CreateUserID = #{cmsContent.createUserID,jdbcType=INTEGER}
+		<if test="condition.contentStatus != null and condition.contentStatus != ''">
+			and C.Status = #{condition.contentStatus,jdbcType=VARCHAR}
+		</if>
+		<if test="condition.createUserID != null and condition.createUserID != 0">
+			and C.CreateUserID = #{condition.createUserID,jdbcType=INTEGER}
 		</if>
 		<if test="page != null">
 			order by ${page.sortField} ${page.sortType}

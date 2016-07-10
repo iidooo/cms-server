@@ -3,6 +3,7 @@ package com.iidooo.cms.service;
 import java.util.List;
 
 import com.iidooo.cms.model.po.CmsContent;
+import com.iidooo.cms.model.vo.SearchCondition;
 import com.iidooo.core.model.Page;
 
 public interface ContentService {
@@ -62,9 +63,20 @@ public interface ContentService {
      */
     List<CmsContent> getContentList(CmsContent content, Page page);
 
-    int getContentListCount(CmsContent cmsContent, String startDate, String endDate);
+    /**
+     * 通过查询条件得到内容列表项目数
+     * @param condition 查询条件
+     * @return 项目数量
+     */
+    int getContentsCount(SearchCondition condition);
 
-    List<CmsContent> getContentList(CmsContent cmsContent, String startDate, String endDate, Page page);
+    /**
+     * 通过查询条件得到内容列表
+     * @param condition 查询条件
+     * @param page 分页条件
+     * @return 内容列表
+     */
+    List<CmsContent> getContents(SearchCondition condition, Page page);
 
     boolean createContent(CmsContent content) throws Exception;
 

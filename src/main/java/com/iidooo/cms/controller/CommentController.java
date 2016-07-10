@@ -19,6 +19,7 @@ import com.iidooo.cms.model.po.CmsContent;
 import com.iidooo.cms.service.CmsCommentNoticeService;
 import com.iidooo.cms.service.CommentService;
 import com.iidooo.cms.service.ContentService;
+import com.iidooo.core.constant.RegularConstant;
 import com.iidooo.core.enums.MessageLevel;
 import com.iidooo.core.enums.MessageType;
 import com.iidooo.core.enums.ResponseStatus;
@@ -66,7 +67,7 @@ public class CommentController {
                 result.getMessages().add(message);
                 result.setStatus(ResponseStatus.Failed.getCode());
                 return result;
-            } else if (!ValidateUtil.isNumber(contentIDStr)) {
+            } else if (!ValidateUtil.isMatch(contentIDStr, RegularConstant.REGEX_NUMBER)) {
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "contentID");
                 result.getMessages().add(message);
                 result.setStatus(ResponseStatus.Failed.getCode());
@@ -110,7 +111,7 @@ public class CommentController {
 
             // 删除该用户对于该内容的评论通知
             if (StringUtil.isNotBlank(userIDStr)) {
-                if (!ValidateUtil.isNumber(userIDStr)) {
+                if (!ValidateUtil.isMatch(userIDStr, RegularConstant.REGEX_NUMBER)) {
                     Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "userID");
                     result.getMessages().add(message);
                 } else {
@@ -138,7 +139,7 @@ public class CommentController {
                 result.getMessages().add(message);
                 result.setStatus(ResponseStatus.Failed.getCode());
                 return result;
-            } else if (!ValidateUtil.isNumber(userID)) {
+            } else if (!ValidateUtil.isMatch(userID, RegularConstant.REGEX_NUMBER)) {
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "userID");
                 result.getMessages().add(message);
                 result.setStatus(ResponseStatus.Failed.getCode());
@@ -213,7 +214,7 @@ public class CommentController {
             String parentIDStr = request.getParameter("parentID");
             if (StringUtil.isBlank(parentIDStr)) {
                 parentIDStr = "0";
-            } else if (!ValidateUtil.isNumber(parentIDStr)) {
+            } else if (!ValidateUtil.isMatch(parentIDStr, RegularConstant.REGEX_NUMBER)) {
                 result.checkFieldInteger("parentID", parentIDStr);
             }
 
@@ -290,7 +291,7 @@ public class CommentController {
             if (StringUtil.isBlank(commentID)) {
                 Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "commentID");
                 result.getMessages().add(message);
-            } else if (ValidateUtil.isNumber(commentID)) {
+            } else if (ValidateUtil.isMatch(commentID, RegularConstant.REGEX_NUMBER)) {
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "commentID");
                 result.getMessages().add(message);
             }

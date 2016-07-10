@@ -37,6 +37,15 @@
 		order by Sequence
 	</select>
 	
+	<!-- 通过站点ID查询栏目一览 -->
+	<select id="selectBySiteID" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		select
+		<include refid="Base_Column_List" />
+		from cms_channel C
+		where C.IsDelete = 0 and C.SiteID = #{siteID,jdbcType=INTEGER}
+		order by Sequence
+	</select>
+	
 	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
 		delete from cms_channel
 		where ChannelID = #{channelID,jdbcType=INTEGER}

@@ -13,17 +13,68 @@
     <result column="CreateUserID" property="createUserID" jdbcType="INTEGER" />
     <result column="IsDelete" property="isDelete" jdbcType="INTEGER" />
     <result column="Version" property="version" jdbcType="INTEGER" />
+    <association select="selectCreateUser" column="createUserID" property="createUser" javaType="com.iidooo.core.model.po.SecurityUser"></association>
   </resultMap>
   <sql id="Base_Column_List" >
-    SiteID, SiteCode, SiteName, SiteURL, Remarks, UpdateTime, UpdateUserID, CreateTime, 
-    CreateUserID, IsDelete, Version
+    S.SiteID, S.SiteCode, S.SiteName, S.SiteURL, S.Remarks, S.UpdateTime, S.UpdateUserID, S.CreateTime, 
+    S.CreateUserID, S.IsDelete, S.Version
   </sql>
+  
+  <!-- selectCreateUser -->
+  <resultMap id="SecurityUserResultMap" type="com.iidooo.core.model.po.SecurityUser">
+		<id column="UserID" property="userID" jdbcType="INTEGER" />
+		<result column="LoginID" property="loginID" jdbcType="VARCHAR" />
+		<result column="Password" property="password" jdbcType="VARCHAR" />
+		<result column="UserName" property="userName" jdbcType="VARCHAR" />
+		<result column="Mobile" property="mobile" jdbcType="VARCHAR" />
+		<result column="Email" property="email" jdbcType="VARCHAR" />
+		<result column="Sex" property="sex" jdbcType="CHAR" />
+		<result column="Birthday" property="birthday" jdbcType="DATE" />
+		<result column="WeixinID" property="weixinID" jdbcType="VARCHAR" />
+		<result column="PhotoURL" property="photoURL" jdbcType="VARCHAR" />
+		<result column="IsSilent" property="isSilent" jdbcType="INTEGER" />
+		<result column="IsDisable" property="isDisable" jdbcType="INTEGER" />
+		<result column="UserType" property="userType" jdbcType="VARCHAR" />
+		<result column="Level" property="level" jdbcType="INTEGER" />
+		<result column="Points" property="points" jdbcType="INTEGER" />
+		<result column="Experience" property="experience" jdbcType="INTEGER" />
+		<result column="Remarks" property="remarks" jdbcType="VARCHAR" />
+		<result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="UpdateUserID" property="updateUserID" jdbcType="INTEGER" />
+		<result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="CreateUserID" property="createUserID" jdbcType="INTEGER" />
+		<result column="IsDelete" property="isDelete" jdbcType="INTEGER" />
+		<result column="Version" property="version" jdbcType="INTEGER" />
+	</resultMap>
+	<sql id="SecurityUser_Column_List">
+		U.UserID, U.LoginID, '' as password, U.UserName, U.Mobile, U.Email, U.Sex, U.Birthday, U.WeixinID, U.PhotoURL,
+		U.IsSilent, U.IsDisable,
+		U.UserType, U.Level, U.Points, U.Experience, U.Remarks, U.UpdateTime, U.UpdateUserID,
+		U.CreateTime, U.CreateUserID, U.IsDelete, U.Version
+	</sql>
+	<select id="selectCreateUser" parameterType="java.lang.Integer" resultType="com.iidooo.core.model.po.SecurityUser">
+		select
+		<include refid="SecurityUser_Column_List" />
+		from security_user U where UserID = #{createUserID,jdbcType=INTEGER}
+	</select>
+	 
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
     from cms_site
     where SiteID = #{siteID,jdbcType=INTEGER}
   </select>
+  
+  <!-- 查询获取拥有者的站点列表 -->
+  <select id="selectByOwner" resultMap="BaseResultMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from cms_site S 
+    join cms_site_owner O
+    on S.IsDelete = 0 and O.IsDelete = 0 and S.SiteID = O.SiteID
+    where O.UserID = #{userID,jdbcType=INTEGER}
+  </select>
+  
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from cms_site
     where SiteID = #{siteID,jdbcType=INTEGER}

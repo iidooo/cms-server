@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import com.iidooo.cms.model.po.CmsContent;
+import com.iidooo.cms.model.vo.SearchCondition;
 import com.iidooo.core.model.Page;
 
 public interface CmsContentMapper {
@@ -93,23 +94,19 @@ public interface CmsContentMapper {
     /**
      * 检索内容一览信息的数量
      * 
-     * @param cmsContent 检索的条件封装
-     * @param startDate 内容发布开始日期
-     * @param endDate 内容发布结束日期
+     * @param condition 检索的条件封装
      * @return 得到的内容一览列表
      */
-    int selectCountForSearch(@Param("cmsContent") CmsContent cmsContent, @Param("startDate") String startDate, @Param("endDate") String endDate);
+    int selectCountForSearch(SearchCondition condition);
 
     /**
      * 检索内容一览信息
      * 
-     * @param cmsContent 检索的条件封装
-     * @param startDate 内容发布开始日期
-     * @param endDate 内容发布结束日期
+     * @param condition 检索的条件封装
+     * @param page 分页对象
      * @return 得到的内容一览列表
      */
-    List<CmsContent> selectForSearch(@Param("cmsContent") CmsContent cmsContent, @Param("startDate") String startDate,
-            @Param("endDate") String endDate, @Param("page") Page page);
+    List<CmsContent> selectForSearch(@Param("condition")SearchCondition condition, @Param("page") Page page);
 
     /**
      * 根据ContentID更新CmsContent

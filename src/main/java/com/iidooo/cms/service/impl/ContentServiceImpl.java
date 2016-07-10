@@ -21,6 +21,7 @@ import com.iidooo.cms.model.po.CmsContent;
 import com.iidooo.cms.model.po.CmsContentNews;
 import com.iidooo.cms.model.po.CmsFavorite;
 import com.iidooo.cms.model.po.CmsPicture;
+import com.iidooo.cms.model.vo.SearchCondition;
 import com.iidooo.cms.service.ContentService;
 import com.iidooo.core.mapper.DictItemMapper;
 import com.iidooo.core.model.Page;
@@ -181,9 +182,9 @@ public class ContentServiceImpl implements ContentService {
     }
 
     @Override
-    public int getContentListCount(CmsContent cmsContent, String startDate, String endDate) {
+    public int getContentsCount(SearchCondition condition) {
         try {
-            int count = cmsContentDao.selectCountForSearch(cmsContent, startDate, endDate);
+            int count = cmsContentDao.selectCountForSearch(condition);
             return count;
         } catch (Exception e) {
             logger.fatal(e);
@@ -192,9 +193,9 @@ public class ContentServiceImpl implements ContentService {
     }
 
     @Override
-    public List<CmsContent> getContentList(CmsContent cmsContent, String startDate, String endDate, Page page) {
+    public List<CmsContent> getContents(SearchCondition condition, Page page) {
         try {
-            List<CmsContent> result = cmsContentDao.selectForSearch(cmsContent, startDate, endDate, page);
+            List<CmsContent> result = cmsContentDao.selectForSearch(condition, page);
 
             return result;
         } catch (Exception e) {

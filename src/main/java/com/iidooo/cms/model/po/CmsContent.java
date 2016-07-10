@@ -10,6 +10,8 @@ import com.iidooo.core.model.po.SecurityUser;
 public class CmsContent {
     
     private Integer contentID;
+    
+    private Integer siteID;
 
     private Integer channelID;
     
@@ -79,6 +81,14 @@ public class CmsContent {
 
     public void setContentID(Integer contentID) {
         this.contentID = contentID;
+    }       
+
+    public Integer getSiteID() {
+        return siteID;
+    }
+
+    public void setSiteID(Integer siteID) {
+        this.siteID = siteID;
     }
 
     public Integer getChannelID() {

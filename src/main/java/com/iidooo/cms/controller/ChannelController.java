@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.iidooo.cms.model.po.CmsChannel;
 import com.iidooo.cms.service.ChannelService;
+import com.iidooo.cms.util.ChannelUtil;
 import com.iidooo.core.enums.ResponseStatus;
 import com.iidooo.core.model.ResponseResult;
 
@@ -43,6 +44,34 @@ public class ChannelController {
             // 返回找到的内容对象
             result.setStatus(ResponseStatus.OK.getCode());
             result.setData(channels);
+            
+        } catch (Exception e) {
+            logger.fatal(e);
+            result.checkException(e);
+        }
+        return result;
+    }
+    
+    @ResponseBody
+    @RequestMapping(value = {"/admin/getChannelTree"}, method = RequestMethod.POST)
+    public ResponseResult getChannelTree(HttpServletRequest request, HttpServletResponse response) {
+        ResponseResult result = new ResponseResult();
+        try {
+            
+            String siteID = request.getParameter("siteID");
+            result.checkFieldRequired("siteID", siteID);
+            result.checkFieldInteger("siteID", siteID);
+            
+            if (result.getMessages().size() > 0) {
+                result.setStatus(ResponseStatus.Failed.getCode());
+                return result;
+            }
+            
+            List<CmsChannel> channels = channelService.getChannelList(Integer.parseInt(siteID));   
+            
+            // 返回找到的内容对象
+            result.setStatus(ResponseStatus.OK.getCode());
+            result.setData(ChannelUtil.constructChannelTree(channels));
             
         } catch (Exception e) {
             logger.fatal(e);

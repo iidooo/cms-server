@@ -2,16 +2,14 @@ package com.iidooo.cms.model.po;
 
 import java.util.Date;
 
-import com.iidooo.core.model.po.SecurityUser;
+public class CmsSiteOwner {
+    private Integer relID;
 
-public class CmsSite {
     private Integer siteID;
 
-    private String siteCode;
+    private Integer userID;
 
-    private String siteName;
-
-    private String siteURL;
+    private String role;
 
     private String remarks;
 
@@ -22,12 +20,18 @@ public class CmsSite {
     private Date createTime;
 
     private Integer createUserID;
-    
-    private SecurityUser createUser;
 
     private Integer isDelete;
 
     private Integer version;
+
+    public Integer getRelID() {
+        return relID;
+    }
+
+    public void setRelID(Integer relID) {
+        this.relID = relID;
+    }
 
     public Integer getSiteID() {
         return siteID;
@@ -37,28 +41,20 @@ public class CmsSite {
         this.siteID = siteID;
     }
 
-    public String getSiteCode() {
-        return siteCode;
+    public Integer getUserID() {
+        return userID;
     }
 
-    public void setSiteCode(String siteCode) {
-        this.siteCode = siteCode == null ? null : siteCode.trim();
+    public void setUserID(Integer userID) {
+        this.userID = userID;
     }
 
-    public String getSiteName() {
-        return siteName;
+    public String getRole() {
+        return role;
     }
 
-    public void setSiteName(String siteName) {
-        this.siteName = siteName == null ? null : siteName.trim();
-    }
-
-    public String getSiteURL() {
-        return siteURL;
-    }
-
-    public void setSiteURL(String siteURL) {
-        this.siteURL = siteURL == null ? null : siteURL.trim();
+    public void setRole(String role) {
+        this.role = role == null ? null : role.trim();
     }
 
     public String getRemarks() {
@@ -99,14 +95,6 @@ public class CmsSite {
 
     public void setCreateUserID(Integer createUserID) {
         this.createUserID = createUserID;
-    }
-    
-    public SecurityUser getCreateUser() {
-        return createUser;
-    }
-
-    public void setCreateUser(SecurityUser createUser) {
-        this.createUser = createUser;
     }
 
     public Integer getIsDelete() {

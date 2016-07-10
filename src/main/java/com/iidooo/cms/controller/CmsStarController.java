@@ -16,6 +16,7 @@ import com.iidooo.cms.enums.TableName;
 import com.iidooo.cms.model.po.CmsStar;
 import com.iidooo.cms.service.CmsStarService;
 import com.iidooo.cms.service.ContentService;
+import com.iidooo.core.constant.RegularConstant;
 import com.iidooo.core.enums.MessageLevel;
 import com.iidooo.core.enums.MessageType;
 import com.iidooo.core.enums.ResponseStatus;
@@ -52,14 +53,14 @@ public class CmsStarController {
             if (StringUtil.isBlank(createUserID)) {
                 Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "createUserID");
                 result.getMessages().add(message);
-            } else if (!ValidateUtil.isNumber(createUserID)) {
+            } else if (!ValidateUtil.isMatch(createUserID, RegularConstant.REGEX_NUMBER)) {
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "createUserID");
                 result.getMessages().add(message);
             }
             if (StringUtil.isBlank(contentID)) {
                 Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "contentID");
                 result.getMessages().add(message);
-            } else if (!ValidateUtil.isNumber(contentID)) {
+            } else if (!ValidateUtil.isMatch(contentID, RegularConstant.REGEX_NUMBER)) {
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "contentID");
                 result.getMessages().add(message);
             }
@@ -114,14 +115,14 @@ public class CmsStarController {
             if (StringUtil.isBlank(createUserID)) {
                 Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "createUserID");
                 result.getMessages().add(message);
-            } else if (!ValidateUtil.isNumber(createUserID)) {
+            } else if (!ValidateUtil.isMatch(createUserID, RegularConstant.REGEX_NUMBER)) {
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "createUserID");
                 result.getMessages().add(message);
             }
             if (StringUtil.isBlank(contentID)) {
                 Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "contentID");
                 result.getMessages().add(message);
-            } else if (!ValidateUtil.isNumber(contentID)) {
+            } else if (!ValidateUtil.isMatch(contentID, RegularConstant.REGEX_NUMBER)) {
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "contentID");
                 result.getMessages().add(message);
             }

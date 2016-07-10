@@ -13,9 +13,17 @@ public interface CmsChannelMapper {
     
     /**
      * 查询栏目一览
+     * @param siteCode 站点Code
      * @return 得到栏目一览列表
      */
     List<CmsChannel> selectChannelList(String siteCode);
+    
+    /**
+     * 通过站点ID查询栏目一览
+     * @param siteID 站点ID
+     * @return 得到的栏目一览列表
+     */
+    List<CmsChannel> selectBySiteID(Integer siteID);
 
     int updateByPrimaryKeySelective(CmsChannel record);
 

@@ -24,6 +24,7 @@ import com.iidooo.cms.enums.ContentType;
 import com.iidooo.cms.enums.TableName;
 import com.iidooo.cms.model.vo.SecurityUserInfo;
 import com.iidooo.cms.service.ContentService;
+import com.iidooo.core.constant.RegularConstant;
 import com.iidooo.core.constant.ServletConstant;
 import com.iidooo.core.enums.MessageLevel;
 import com.iidooo.core.enums.MessageType;
@@ -73,7 +74,7 @@ public class CmsUserController {
                 result.getMessages().add(message);
                 result.setStatus(ResponseStatus.Failed.getCode());
                 return result;
-            } else if (!ValidateUtil.isNumber(userID)) {
+            } else if (!ValidateUtil.isMatch(userID, RegularConstant.REGEX_NUMBER)) {
                 // 验证失败，返回message
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "userID");
                 result.getMessages().add(message);
@@ -226,7 +227,7 @@ public class CmsUserController {
                 result.getMessages().add(message);
                 result.setStatus(ResponseStatus.Failed.getCode());
                 return result;
-            } else if (!ValidateUtil.isNumber(userID)) {
+            } else if (!ValidateUtil.isMatch(userID, RegularConstant.REGEX_NUMBER)) {
                 // 验证失败，返回message
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "userID");
                 result.getMessages().add(message);
@@ -286,10 +287,10 @@ public class CmsUserController {
             }
             userInfo.setWeixinID(weixinID);
             userInfo.setPhotoURL(photoURL);
-            if (StringUtil.isNotBlank(isSilent) && ValidateUtil.isNumber(isSilent)) {
+            if (StringUtil.isNotBlank(isSilent) && ValidateUtil.isMatch(isSilent, RegularConstant.REGEX_NUMBER)) {
                 userInfo.setIsSilent(Integer.parseInt(isSilent));
             }
-            if (StringUtil.isNotBlank(isDisable) && ValidateUtil.isNumber(isDisable)) {
+            if (StringUtil.isNotBlank(isDisable) && ValidateUtil.isMatch(isDisable, RegularConstant.REGEX_NUMBER)) {
                 userInfo.setIsDisable(Integer.parseInt(isDisable));
             }
 
@@ -327,7 +328,7 @@ public class CmsUserController {
                 // 验证失败，返回message
                 Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "userID");
                 result.getMessages().add(message);
-            } else if (!ValidateUtil.isNumber(userIDStr)) {
+            } else if (!ValidateUtil.isMatch(userIDStr, RegularConstant.REGEX_NUMBER)) {
                 // 验证失败，返回message
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "userID");
                 result.getMessages().add(message);
@@ -337,7 +338,7 @@ public class CmsUserController {
                 // 验证失败，返回message
                 Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "experience");
                 result.getMessages().add(message);
-            } else if (!ValidateUtil.isNumber(experienceStr)) {
+            } else if (!ValidateUtil.isMatch(experienceStr, RegularConstant.REGEX_NUMBER)) {
                 // 验证失败，返回message
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "experience");
                 result.getMessages().add(message);
@@ -348,7 +349,7 @@ public class CmsUserController {
                 return result;
             }
 
-            if (StringUtil.isBlank(isLimitedStr) || !ValidateUtil.isNumber(isLimitedStr)) {
+            if (StringUtil.isBlank(isLimitedStr) || !ValidateUtil.isMatch(isLimitedStr, RegularConstant.REGEX_NUMBER)) {
                 isLimitedStr = "1";
             }
 

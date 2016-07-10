@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.iidooo.cms.enums.TableName;
 import com.iidooo.cms.model.vo.CmsContentWrap;
 import com.iidooo.cms.service.FavoriteService;
+import com.iidooo.core.constant.RegularConstant;
 import com.iidooo.core.enums.MessageLevel;
 import com.iidooo.core.enums.MessageType;
 import com.iidooo.core.enums.ResponseStatus;
@@ -50,14 +51,14 @@ public class FavoriteController {
             if (StringUtil.isBlank(contentIDStr)) {
                 Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "contentID");
                 result.getMessages().add(message);
-            } else if (!ValidateUtil.isNumber(contentIDStr)) {
+            } else if (!ValidateUtil.isMatch(contentIDStr, RegularConstant.REGEX_NUMBER)) {
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "contentID");
                 result.getMessages().add(message);
             }
             if (StringUtil.isBlank(userIDStr)) {
                 Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "userID");
                 result.getMessages().add(message);
-            } else if (!ValidateUtil.isNumber(userIDStr)) {
+            } else if (!ValidateUtil.isMatch(userIDStr, RegularConstant.REGEX_NUMBER)) {
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "userID");
                 result.getMessages().add(message);
             }
@@ -104,14 +105,14 @@ public class FavoriteController {
             if (StringUtil.isBlank(contentIDStr)) {
                 Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "contentID");
                 result.getMessages().add(message);
-            } else if (!ValidateUtil.isNumber(contentIDStr)) {
+            } else if (!ValidateUtil.isMatch(contentIDStr, RegularConstant.REGEX_NUMBER)) {
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "contentID");
                 result.getMessages().add(message);
             }
             if (StringUtil.isBlank(userIDStr)) {
                 Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "userID");
                 result.getMessages().add(message);
-            } else if (!ValidateUtil.isNumber(userIDStr)) {
+            } else if (!ValidateUtil.isMatch(userIDStr, RegularConstant.REGEX_NUMBER)) {
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "userID");
                 result.getMessages().add(message);
             }
@@ -181,7 +182,7 @@ public class FavoriteController {
             if (StringUtil.isBlank(userIDStr)) {
                 Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "userID");
                 result.getMessages().add(message);
-            } else if (!ValidateUtil.isNumber(userIDStr)) {
+            } else if (!ValidateUtil.isMatch(userIDStr, RegularConstant.REGEX_NUMBER)) {
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "userID");
                 result.getMessages().add(message);
             }

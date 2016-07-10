@@ -25,8 +25,10 @@ import com.iidooo.cms.enums.TableName;
 import com.iidooo.cms.model.po.CmsContent;
 import com.iidooo.cms.model.po.CmsContentNews;
 import com.iidooo.cms.model.po.CmsPicture;
+import com.iidooo.cms.model.vo.SearchCondition;
 import com.iidooo.cms.service.ContentService;
 import com.iidooo.cms.service.FavoriteService;
+import com.iidooo.core.constant.RegularConstant;
 import com.iidooo.core.enums.MessageLevel;
 import com.iidooo.core.enums.MessageType;
 import com.iidooo.core.enums.ResponseStatus;
@@ -67,35 +69,43 @@ public class ContentController {
     private SecurityUserService sercurityUserService;
 
     @ResponseBody
-    @RequestMapping(value = "/admin/searchContentList", method = RequestMethod.POST)
-    public ResponseResult searchContentList(HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(value = "/admin/searchContents", method = RequestMethod.POST)
+    public ResponseResult searchContents(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
         try {
+            String siteID = request.getParameter("siteID");
+            result.checkFieldRequired("siteID", siteID);
+            result.checkFieldInteger("siteID", siteID);
+            if (result.getMessages().size() > 0) {
+                // 验证失败，返回message
+                result.setStatus(ResponseStatus.Failed.getCode());
+                return result;
+            }
+            
             String channelID = request.getParameter("channelID");
             String contentTitle = request.getParameter("contentTitle");
             String contentType = request.getParameter("contentType");
-            String startDate = request.getParameter("startDate");
-            String endDate = request.getParameter("endDate");
-            String status = request.getParameter("status");
-            String userID = request.getParameter("userID");
+            String startDateTime = request.getParameter("startDateTime");
+            String endDateTime = request.getParameter("endDateTime");
+            String contentStatus = request.getParameter("contentStatus");
+            String createUserID = request.getParameter("createUserID");
 
-            if (StringUtil.isNotBlank(startDate)) {
-                startDate = startDate + " 00:00:00";
+            SearchCondition condition = new SearchCondition();
+            condition.setSiteID(Integer.parseInt(siteID));
+            
+            if (StringUtil.isNotBlank(channelID) && ValidateUtil.isMatch(channelID, RegularConstant.REGEX_NUMBER)) {
+                condition.setChannelID(Integer.parseInt(channelID));
             }
-
-            if (StringUtil.isNotBlank(endDate)) {
-                startDate = startDate + " 23:59:59";
+            condition.setContentTitle(contentTitle);
+            condition.setContentType(contentType);
+            condition.setStartDateTime(startDateTime);
+            condition.setEndDateTime(endDateTime);
+            condition.setContentStatus(contentStatus);
+            
+            if (StringUtil.isNotBlank(createUserID) && ValidateUtil.isMatch(createUserID, RegularConstant.REGEX_NUMBER)) {
+                condition.setCreateUserID(Integer.parseInt(createUserID));
             }
-
-            CmsContent cmsContent = new CmsContent();
-            cmsContent.setChannelID(Integer.valueOf(channelID));
-            cmsContent.setContentTitle(contentTitle);
-            cmsContent.setContentType(contentType);
-            cmsContent.setStatus(status);
-            if (StringUtil.isNotBlank(userID)) {
-                cmsContent.setCreateUserID(Integer.parseInt(userID));
-            }
-            int recordSum = contentService.getContentListCount(cmsContent, startDate, endDate);
+            int recordSum = contentService.getContentsCount(condition);
 
             Page page = new Page();
             String sortField = request.getParameter("sortField");
@@ -107,25 +117,24 @@ public class ContentController {
                 page.setSortType(sortType);
             }
             String pageSize = request.getParameter("pageSize");
-            if (StringUtil.isNotBlank(pageSize) && ValidateUtil.isNumber(pageSize)) {
+            if (StringUtil.isNotBlank(pageSize) && ValidateUtil.isMatch(pageSize, RegularConstant.REGEX_NUMBER)) {
                 page.setPageSize(Integer.parseInt(pageSize));
             }
             String currentPage = request.getParameter("currentPage");
-            if (StringUtil.isNotBlank(currentPage) && ValidateUtil.isNumber(currentPage) && Integer.parseInt(currentPage) > 0) {
+            if (StringUtil.isNotBlank(currentPage) && ValidateUtil.isMatch(currentPage, RegularConstant.REGEX_NUMBER) && Integer.parseInt(currentPage) > 0) {
                 page.setCurrentPage(Integer.parseInt(currentPage));
             }
             page = PageUtil.executePage(recordSum, page);
 
             Map<String, Object> data = new HashMap<String, Object>();
-            List<CmsContent> contentList = contentService.getContentList(cmsContent, startDate, endDate, page);
+            List<CmsContent> contents = contentService.getContents(condition, page);
             data.put("page", page);
-            data.put("contentList", contentList);
+            data.put("contents", contents);
             // 返回找到的内容对象
             result.setStatus(ResponseStatus.OK.getCode());
             result.setData(data);
 
         } catch (Exception e) {
-
             logger.fatal(e);
             result.checkException(e);
         }
@@ -143,7 +152,7 @@ public class ContentController {
             if (StringUtil.isBlank(contentIDStr)) {
                 Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "contentID");
                 result.getMessages().add(message);
-            } else if (!ValidateUtil.isNumber(contentIDStr)) {
+            } else if (!ValidateUtil.isMatch(contentIDStr, RegularConstant.REGEX_NUMBER)) {
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "contentID");
                 result.getMessages().add(message);
             }
@@ -151,7 +160,7 @@ public class ContentController {
             if (StringUtil.isBlank(userIDStr)) {
                 Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "userID");
                 result.getMessages().add(message);
-            } else if (!ValidateUtil.isNumber(userIDStr)) {
+            } else if (!ValidateUtil.isMatch(userIDStr, RegularConstant.REGEX_NUMBER)) {
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "userID");
                 result.getMessages().add(message);
             }
@@ -277,7 +286,7 @@ public class ContentController {
             if (StringUtil.isBlank(contentID)) {
                 Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "contentID");
                 result.getMessages().add(message);
-            } else if (!ValidateUtil.isNumber(contentID)) {
+            } else if (!ValidateUtil.isMatch(contentID, RegularConstant.REGEX_NUMBER)) {
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "contentID");
                 result.getMessages().add(message);
             }
@@ -290,7 +299,7 @@ public class ContentController {
 
             String userIDStr = request.getParameter("userID");
             Integer userID = null;
-            if (StringUtil.isNotBlank(userIDStr) && ValidateUtil.isNumber(userIDStr)) {
+            if (StringUtil.isNotBlank(userIDStr) && ValidateUtil.isMatch(userIDStr, RegularConstant.REGEX_NUMBER)) {
                 userID = Integer.valueOf(userIDStr);
             }
 
@@ -357,13 +366,13 @@ public class ContentController {
             if (StringUtil.isNotBlank(sortType)) {
                 page.setSortType(sortType);
             }
-            if (StringUtil.isNotBlank(start) && ValidateUtil.isNumber(start)) {
+            if (StringUtil.isNotBlank(start) && ValidateUtil.isMatch(start, RegularConstant.REGEX_NUMBER)) {
                 page.setStart(Integer.valueOf(start));
             }
-            if (StringUtil.isNotBlank(pageSize) && ValidateUtil.isNumber(pageSize)) {
+            if (StringUtil.isNotBlank(pageSize) && ValidateUtil.isMatch(pageSize, RegularConstant.REGEX_NUMBER)) {
                 page.setPageSize(Integer.valueOf(pageSize));
             }
-            if (StringUtil.isNotBlank(currentPage) && ValidateUtil.isNumber(currentPage) && Integer.parseInt(currentPage) > 0) {
+            if (StringUtil.isNotBlank(currentPage) && ValidateUtil.isMatch(currentPage, RegularConstant.REGEX_NUMBER) && Integer.parseInt(currentPage) > 0) {
                 page.setCurrentPage(Integer.parseInt(currentPage));
             }
 
@@ -474,10 +483,10 @@ public class ContentController {
             content.setMetaDescription(metaDescription);
             content.setContentSummary(contentSummary);
             content.setContentBody(contentBody);
-            if (StringUtil.isNotBlank(isSilent) && ValidateUtil.isNumber(isSilent)) {
+            if (StringUtil.isNotBlank(isSilent) && ValidateUtil.isMatch(isSilent, RegularConstant.REGEX_NUMBER)) {
                 content.setIsSilent(Integer.parseInt(isSilent));
             }
-            if (StringUtil.isNotBlank(stickyIndex) && ValidateUtil.isNumber(stickyIndex)) {
+            if (StringUtil.isNotBlank(stickyIndex) && ValidateUtil.isMatch(stickyIndex, RegularConstant.REGEX_NUMBER)) {
                 content.setStickyIndex(Integer.parseInt(stickyIndex));
             }
 
@@ -502,7 +511,7 @@ public class ContentController {
                 content.setEndShowTime(DateUtil.format(endShowTime, DateUtil.DATE_TIME_HYPHEN, DateUtil.TIME_COLON));
             }
 
-            if (StringUtil.isNotBlank(status) && ValidateUtil.isNumber(status)) {
+            if (StringUtil.isNotBlank(status) && ValidateUtil.isMatch(status, RegularConstant.REGEX_NUMBER)) {
                 content.setStatus(status);
             } else {
                 content.setStatus("0");
@@ -567,7 +576,7 @@ public class ContentController {
             if (StringUtil.isBlank(contentIDStr)) {
                 Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "contentID");
                 result.getMessages().add(message);
-            } else if (!ValidateUtil.isNumber(contentIDStr)) {
+            } else if (!ValidateUtil.isMatch(contentIDStr, RegularConstant.REGEX_NUMBER)) {
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "contentID");
                 result.getMessages().add(message);
             }
@@ -575,7 +584,7 @@ public class ContentController {
             if (StringUtil.isBlank(channelIDStr)) {
                 Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "channelID");
                 result.getMessages().add(message);
-            } else if (!ValidateUtil.isNumber(channelIDStr)) {
+            } else if (!ValidateUtil.isMatch(channelIDStr, RegularConstant.REGEX_NUMBER)) {
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "channelID");
                 result.getMessages().add(message);
             }
@@ -583,7 +592,7 @@ public class ContentController {
             if (StringUtil.isBlank(userIDStr)) {
                 Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "userID");
                 result.getMessages().add(message);
-            } else if (!ValidateUtil.isNumber(userIDStr)) {
+            } else if (!ValidateUtil.isMatch(userIDStr, RegularConstant.REGEX_NUMBER)) {
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "userID");
                 result.getMessages().add(message);
             }
@@ -591,7 +600,7 @@ public class ContentController {
             if (StringUtil.isBlank(contentType)) {
                 Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "contentType");
                 result.getMessages().add(message);
-            } else if (!ValidateUtil.isNumber(contentType)) {
+            } else if (!ValidateUtil.isMatch(contentType, RegularConstant.REGEX_NUMBER)) {
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "contentType");
                 result.getMessages().add(message);
             }
@@ -652,10 +661,10 @@ public class ContentController {
             content.setMetaDescription(metaDescription);
             content.setContentSummary(contentSummary);
             content.setContentBody(contentBody);
-            if (StringUtil.isNotBlank(isSilent) && ValidateUtil.isNumber(isSilent)) {
+            if (StringUtil.isNotBlank(isSilent) && ValidateUtil.isMatch(isSilent, RegularConstant.REGEX_NUMBER)) {
                 content.setIsSilent(Integer.parseInt(isSilent));
             }
-            if (StringUtil.isNotBlank(stickyIndex) && ValidateUtil.isNumber(stickyIndex)) {
+            if (StringUtil.isNotBlank(stickyIndex) && ValidateUtil.isMatch(stickyIndex, RegularConstant.REGEX_NUMBER)) {
                 content.setStickyIndex(Integer.parseInt(stickyIndex));
             }
 
@@ -680,7 +689,7 @@ public class ContentController {
                 content.setEndShowTime(DateUtil.format(endShowTime, DateUtil.DATE_TIME_HYPHEN, DateUtil.TIME_COLON));
             }
 
-            if (StringUtil.isNotBlank(status) && ValidateUtil.isNumber(status)) {
+            if (StringUtil.isNotBlank(status) && ValidateUtil.isMatch(status, RegularConstant.REGEX_NUMBER)) {
                 content.setStatus(status);
             }
 
