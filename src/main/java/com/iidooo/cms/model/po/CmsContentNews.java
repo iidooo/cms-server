@@ -3,6 +3,8 @@ package com.iidooo.cms.model.po;
 
 public class CmsContentNews extends CmsContent{
     private Integer contentID;
+    
+    private String author;
 
     private String source;
 
@@ -14,6 +16,14 @@ public class CmsContentNews extends CmsContent{
 
     public void setContentID(Integer contentID) {
         this.contentID = contentID;
+    }       
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public String getSource() {

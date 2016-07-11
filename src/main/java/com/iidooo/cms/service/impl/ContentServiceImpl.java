@@ -241,9 +241,9 @@ public class ContentServiceImpl implements ContentService {
 
     @Override
     @Transactional
-    public boolean createContent(CmsContent content) throws Exception {
+    public CmsContent createContent(CmsContent content) {
+        CmsContent result = null;
         try {
-
             if (cmsContentDao.insert(content) <= 0) {
                 throw new Exception();
             }
@@ -255,22 +255,11 @@ public class ContentServiceImpl implements ContentService {
                 }
             }
 
-            for (CmsPicture picture : content.getPictureList()) {
-                picture.setCreateTime(new Date());
-                picture.setCreateUserID(content.getCreateUserID());
-                picture.setUpdateTime(new Date());
-                picture.setUpdateUserID(content.getCreateUserID());
-                picture.setContentID(content.getContentID());
-                if (cmsPictureDao.insert(picture) <= 0) {
-                    throw new Exception();
-                }
-            }
-
-            return true;
+            result = cmsContentDao.selectByContentID(content.getContentID());
         } catch (Exception e) {
             logger.fatal(e);
-            throw e;
         }
+        return result;
     }
 
     @Override

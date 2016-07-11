@@ -11,6 +11,11 @@ import com.iidooo.core.model.Page;
 public interface CmsContentMapper {
     int deleteByPrimaryKey(Integer contentID);
 
+    /**
+     * 插入内容对象
+     * @param content 内容对象
+     * @return 插入操作所影响的行数
+     */
     int insert(CmsContent content);
 
     /**

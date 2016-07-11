@@ -22,7 +22,8 @@
 		<result column="StartShowTime" property="startShowTime" jdbcType="VARCHAR" />
 		<result column="EndShowDate" property="endShowDate" jdbcType="VARCHAR" />
 		<result column="EndShowTime" property="endShowTime" jdbcType="VARCHAR" />
-    	<result column="Status" property="status" jdbcType="VARCHAR" />
+    	<result column="Status" property="status" jdbcType="VARCHAR" />    	
+    	<result column="Author" property="author" jdbcType="VARCHAR" />
 		<result column="Source" property="source" jdbcType="VARCHAR" />
 		<result column="SourceURL" property="sourceURL" jdbcType="VARCHAR" />
 		<result column="Remarks" jdbcType="VARCHAR" property="remarks" />
@@ -52,7 +53,7 @@
 		C.MetaTitle, C.MetaKeywords,
 		C.MetaDescription, C.ContentSummary, C.IsSilent, C.StickyIndex, C.PageViewCount,
 		C.UniqueVisitorCount, C.StarCount, C.CommentCount, C.StartShowDate, C.StartShowTime, 
-    	C.EndShowDate, C.EndShowTime, C.Status, N.Source,
+    	C.EndShowDate, C.EndShowTime, C.Status, N.Author, N.Source,
 		N.SourceURL, C.Remarks, C.CreateTime, C.CreateUserID, C.UpdateTime, C.UpdateUserID,
 		C.IsDelete, C.Version
 	</sql>
@@ -224,11 +225,16 @@
 		delete from cms_content_news
 		where ContentID = #{contentID,jdbcType=INTEGER}
 	</delete>
+	
+	<!-- 插入新的新闻内容对象 -->
 	<insert id="insert" parameterType="com.iidooo.cms.model.po.CmsContentNews">
 		insert into cms_content_news
 		<trim prefix="(" suffix=")" suffixOverrides=",">
 			<if test="contentID != null">
 				ContentID,
+			</if>
+			<if test="author != null">
+				Author,
 			</if>
 			<if test="source != null">
 				Source,
@@ -240,6 +246,9 @@
 		<trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="contentID != null">
 				#{contentID,jdbcType=INTEGER},
+			</if>
+			<if test="author != null">
+				#{author,jdbcType=VARCHAR},
 			</if>
 			<if test="source != null">
 				#{source,jdbcType=VARCHAR},
@@ -254,6 +263,9 @@
 	<update id="updateByContentID" parameterType="com.iidooo.cms.model.po.CmsContentNews">
 		update cms_content_news
 		<set>
+			<if test="author != null">
+				Author = #{author,jdbcType=VARCHAR},
+			</if>
 			<if test="source != null">
 				Source = #{source,jdbcType=VARCHAR},
 			</if>

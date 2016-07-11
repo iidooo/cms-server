@@ -78,7 +78,12 @@ public interface ContentService {
      */
     List<CmsContent> getContents(SearchCondition condition, Page page);
 
-    boolean createContent(CmsContent content) throws Exception;
+    /**
+     * 创建内容对象
+     * @param content 创建该对象
+     * @return 创建成功返回该对象
+     */
+    CmsContent createContent(CmsContent content);
 
     boolean updateContent(CmsContent content, boolean isPicutureListUpdate) throws Exception;
 

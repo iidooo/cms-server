@@ -81,7 +81,7 @@ public class ContentController {
                 result.setStatus(ResponseStatus.Failed.getCode());
                 return result;
             }
-            
+
             String channelID = request.getParameter("channelID");
             String contentTitle = request.getParameter("contentTitle");
             String contentType = request.getParameter("contentType");
@@ -92,7 +92,7 @@ public class ContentController {
 
             SearchCondition condition = new SearchCondition();
             condition.setSiteID(Integer.parseInt(siteID));
-            
+
             if (StringUtil.isNotBlank(channelID) && ValidateUtil.isMatch(channelID, RegularConstant.REGEX_NUMBER)) {
                 condition.setChannelID(Integer.parseInt(channelID));
             }
@@ -101,7 +101,7 @@ public class ContentController {
             condition.setStartDateTime(startDateTime);
             condition.setEndDateTime(endDateTime);
             condition.setContentStatus(contentStatus);
-            
+
             if (StringUtil.isNotBlank(createUserID) && ValidateUtil.isMatch(createUserID, RegularConstant.REGEX_NUMBER)) {
                 condition.setCreateUserID(Integer.parseInt(createUserID));
             }
@@ -121,7 +121,8 @@ public class ContentController {
                 page.setPageSize(Integer.parseInt(pageSize));
             }
             String currentPage = request.getParameter("currentPage");
-            if (StringUtil.isNotBlank(currentPage) && ValidateUtil.isMatch(currentPage, RegularConstant.REGEX_NUMBER) && Integer.parseInt(currentPage) > 0) {
+            if (StringUtil.isNotBlank(currentPage) && ValidateUtil.isMatch(currentPage, RegularConstant.REGEX_NUMBER)
+                    && Integer.parseInt(currentPage) > 0) {
                 page.setCurrentPage(Integer.parseInt(currentPage));
             }
             page = PageUtil.executePage(recordSum, page);
@@ -372,7 +373,8 @@ public class ContentController {
             if (StringUtil.isNotBlank(pageSize) && ValidateUtil.isMatch(pageSize, RegularConstant.REGEX_NUMBER)) {
                 page.setPageSize(Integer.valueOf(pageSize));
             }
-            if (StringUtil.isNotBlank(currentPage) && ValidateUtil.isMatch(currentPage, RegularConstant.REGEX_NUMBER) && Integer.parseInt(currentPage) > 0) {
+            if (StringUtil.isNotBlank(currentPage) && ValidateUtil.isMatch(currentPage, RegularConstant.REGEX_NUMBER)
+                    && Integer.parseInt(currentPage) > 0) {
                 page.setCurrentPage(Integer.parseInt(currentPage));
             }
 
@@ -408,14 +410,17 @@ public class ContentController {
         try {
             // 解析获得传入的参数
             // 必填参数
-            String channelIDStr = request.getParameter("channelID");
-            String userIDStr = request.getParameter("userID");
+            String siteID = request.getParameter("siteID");
+            String channelID = request.getParameter("channelID");
+            String userID = request.getParameter("userID");
             String contentType = request.getParameter("contentType");
-
-            result.checkFieldRequired("channelID", channelIDStr);
-            result.checkFieldInteger("channelID", channelIDStr);
-            result.checkFieldRequired("userID", userIDStr);
-            result.checkFieldInteger("userID", userIDStr);
+            
+            result.checkFieldRequired("siteID", siteID);
+            result.checkFieldInteger("siteID", siteID);
+            result.checkFieldRequired("channelID", channelID);
+            result.checkFieldInteger("channelID", channelID);
+            result.checkFieldRequired("userID", userID);
+            result.checkFieldInteger("userID", userID);
             result.checkFieldRequired("contentType", contentType);
             result.checkFieldInteger("contentType", contentType);
 
@@ -425,37 +430,11 @@ public class ContentController {
                 return result;
             }
 
-            int channelID = Integer.parseInt(channelIDStr);
-            Integer userID = Integer.parseInt(userIDStr);
-
-            // 判断用户是否可以创建评论IsSlient＝1
-            SecurityUser userInfo = sercurityUserService.getSecurityUserByID(userID);
-            if (userInfo == null || userInfo.getIsSilent() != 0 || userInfo.getIsDisable() != 0) {
-                // 验证失败，返回message
-                result.setStatus(ResponseStatus.ConfinedFailed.getCode());
-                Message message = new Message(MessageType.IsSlient.getCode(), MessageLevel.WARN, "SecurityUserInfo.IsSlient");
-                result.getMessages().add(message);
-                return result;
-            }
-
             // 获取可选参数
             String contentTitle = request.getParameter("contentTitle");
             String contentSubTitle = request.getParameter("contentSubTitle");
-            String contentImageTitle = request.getParameter("contentImageTitle");
-            String metaTitle = request.getParameter("metaTitle");
-            String metaKeywords = request.getParameter("metaKeywords");
-            String metaDescription = request.getParameter("metaDescription");
             String contentSummary = request.getParameter("contentSummary");
             String contentBody = request.getParameter("contentBody");
-            String isSilent = request.getParameter("isSilent");
-            String stickyIndex = request.getParameter("stickyIndex");
-            String remarks = request.getParameter("remarks");
-            String startShowDate = request.getParameter("startShowDate");
-            String startShowTime = request.getParameter("startShowTime");
-            String endShowDate = request.getParameter("endShowDate");
-            String endShowTime = request.getParameter("endShowTime");
-            String pictureListStr = request.getParameter("pictureList");
-            String status = request.getParameter("status");
 
             // 工厂创建对象
             CmsContent content = null;
@@ -465,96 +444,36 @@ public class ContentController {
                 content = new CmsContentNews();
 
                 // 设置CmsContentNews参数
+                String author = request.getParameter("author");
                 String source = request.getParameter("source");
                 String sourceURL = request.getParameter("sourceURL");
                 CmsContentNews contentNews = (CmsContentNews) content;
+                contentNews.setAuthor(author);
                 contentNews.setSource(source);
                 contentNews.setSourceURL(sourceURL);
             }
 
             // 设置CmsContent属性
-            content.setChannelID(channelID);
+            content.setSiteID(Integer.parseInt(siteID));
+            content.setChannelID(Integer.parseInt(channelID));
             content.setContentType(contentType);
             content.setContentTitle(contentTitle);
-            content.setMetaKeywords(metaKeywords);
             content.setContentSubTitle(contentSubTitle);
-            content.setContentImageTitle(contentImageTitle);
-            content.setMetaTitle(metaTitle);
-            content.setMetaDescription(metaDescription);
             content.setContentSummary(contentSummary);
             content.setContentBody(contentBody);
-            if (StringUtil.isNotBlank(isSilent) && ValidateUtil.isMatch(isSilent, RegularConstant.REGEX_NUMBER)) {
-                content.setIsSilent(Integer.parseInt(isSilent));
-            }
-            if (StringUtil.isNotBlank(stickyIndex) && ValidateUtil.isMatch(stickyIndex, RegularConstant.REGEX_NUMBER)) {
-                content.setStickyIndex(Integer.parseInt(stickyIndex));
-            }
-
-            if (DateUtil.isFormat(startShowDate, DateUtil.DATE_HYPHEN)) {
-                content.setStartShowDate(startShowDate);
-            } else if (DateUtil.isFormat(startShowDate, DateUtil.DATE_TIME_HYPHEN)) {
-                content.setStartShowDate(DateUtil.format(startShowDate, DateUtil.DATE_TIME_HYPHEN, DateUtil.DATE_HYPHEN));
-            }
-            if (DateUtil.isFormat(startShowTime, DateUtil.TIME_COLON)) {
-                content.setStartShowTime(startShowTime);
-            } else if (DateUtil.isFormat(startShowTime, DateUtil.DATE_TIME_HYPHEN)) {
-                content.setStartShowTime(DateUtil.format(startShowTime, DateUtil.DATE_TIME_HYPHEN, DateUtil.TIME_COLON));
-            }
-            if (DateUtil.isFormat(endShowDate, DateUtil.DATE_HYPHEN)) {
-                content.setEndShowDate(endShowDate);
-            } else if (DateUtil.isFormat(endShowDate, DateUtil.DATE_TIME_HYPHEN)) {
-                content.setEndShowDate(DateUtil.format(endShowDate, DateUtil.DATE_TIME_HYPHEN, DateUtil.DATE_HYPHEN));
-            }
-            if (DateUtil.isFormat(endShowTime, DateUtil.TIME_COLON)) {
-                content.setEndShowTime(endShowTime);
-            } else if (DateUtil.isFormat(endShowTime, DateUtil.DATE_TIME_HYPHEN)) {
-                content.setEndShowTime(DateUtil.format(endShowTime, DateUtil.DATE_TIME_HYPHEN, DateUtil.TIME_COLON));
-            }
-
-            if (StringUtil.isNotBlank(status) && ValidateUtil.isMatch(status, RegularConstant.REGEX_NUMBER)) {
-                content.setStatus(status);
-            } else {
-                content.setStatus("0");
-            }
-
-            content.setRemarks(remarks);
             content.setCreateTime(new Date());
-            content.setCreateUserID(userID);
-            content.setUpdateTime(new Date());
-            content.setUpdateUserID(userID);
+            content.setCreateUserID(Integer.parseInt(userID));
+            content.setUpdateUserID(Integer.parseInt(userID));
 
-            if (StringUtil.isNotBlank(pictureListStr)) {
-                JSONArray jsonArray = JSONArray.fromObject(pictureListStr);
-                for (Object object : jsonArray) {
-                    String pictureURL = object.toString();
-                    String pictureName = FileUtil.getFileName(pictureURL);
-                    CmsPicture picture = new CmsPicture();
-                    picture.setPictureName(pictureName);
-                    picture.setPictureURL(pictureURL);
-                    content.getPictureList().add(picture);
-                }
-            }
-
-            // 5秒内存在同样的数据，视为重复
-            CmsContent existContent = contentService.getContentByInfo(userID, contentType, contentBody);
-            if (existContent != null && DateUtil.subtract(new Date(), existContent.getCreateTime()) <= 30) {
-                content = existContent;
+            content = contentService.createContent(content);
+            if (content != null) {
                 result.setStatus(ResponseStatus.OK.getCode());
                 result.setData(content);
             } else {
-                if (contentService.createContent(content)) {
-                    content = contentService.getContent(content.getContentID());
-                    result.setStatus(ResponseStatus.OK.getCode());
-                    result.setData(content);
-                    // 更新浏览记录
-                    hisOperatorService.createHisOperator(TableName.CMS_CONTENT.toString(), content.getContentID(), request);
-                } else {
-                    result.setStatus(ResponseStatus.InsertFailed.getCode());
-                }
+                result.setStatus(ResponseStatus.InsertFailed.getCode());
             }
 
         } catch (Exception e) {
-
             logger.fatal(e);
             result.checkException(e);
         }
