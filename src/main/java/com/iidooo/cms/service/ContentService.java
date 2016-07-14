@@ -85,7 +85,12 @@ public interface ContentService {
      */
     CmsContent createContent(CmsContent content);
 
-    boolean updateContent(CmsContent content, boolean isPicutureListUpdate) throws Exception;
+    /**
+     * 更新内容对象
+     * @param content 要更新的内容对象
+     * @return 更新后返回出来的最新对象
+     */
+    CmsContent updateContent(CmsContent content);
 
     /**
      * 得到点赞数

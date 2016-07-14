@@ -1,8 +1,5 @@
 package com.iidooo.cms.mapper;
 
-import java.util.List;
-
-import com.iidooo.cms.model.po.CmsContent;
 import com.iidooo.cms.model.po.CmsPicture;
 
 public interface CmsPictureMapper {
@@ -22,15 +19,11 @@ public interface CmsPictureMapper {
     int insert(CmsPicture picture);
 
     CmsPicture selectByPrimaryKey(Integer pictureID);
-
-    int updateByPrimaryKeySelective(CmsPicture record);
-
-    int updateByPrimaryKey(CmsPicture record);
     
     /**
-     * 根据内容一览List获得所有相关联的图片一览
-     * @param contentList 内容一览
-     * @return 图片一览List对象
+     * 通过PictureID更新
+     * @param picture
+     * @return 所影响的行数
      */
-    List<CmsPicture> selectByContentList(List<CmsContent> contentList);
+    int updateByPictureID(CmsPicture picture);
 }

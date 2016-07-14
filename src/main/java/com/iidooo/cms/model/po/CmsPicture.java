@@ -10,8 +10,12 @@ public class CmsPicture {
     private String pictureName;
 
     private String pictureURL;
+    
+    private String href;
 
     private Integer sequence;
+    
+    private String description;
 
     private String remarks;
 
@@ -59,12 +63,28 @@ public class CmsPicture {
         this.pictureURL = pictureURL == null ? null : pictureURL.trim();
     }
 
+    public String getHref() {
+        return href;
+    }
+
+    public void setHref(String href) {
+        this.href = href;
+    }
+
     public Integer getSequence() {
         return sequence;
     }
 
     public void setSequence(Integer sequence) {
         this.sequence = sequence;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getRemarks() {

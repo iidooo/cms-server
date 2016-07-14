@@ -8,7 +8,6 @@
 		<result column="ContentType" jdbcType="VARCHAR" property="contentType" />
 		<result column="ContentTitle" jdbcType="VARCHAR" property="contentTitle" />
 		<result column="ContentSubTitle" jdbcType="VARCHAR" property="contentSubTitle" />
-		<result column="ContentImageTitle" jdbcType="VARCHAR" property="contentImageTitle" />
 		<result column="MetaTitle" jdbcType="VARCHAR" property="metaTitle" />
 		<result column="MetaKeywords" jdbcType="VARCHAR" property="metaKeywords" />
 		<result column="MetaDescription" jdbcType="VARCHAR" property="metaDescription" />
@@ -33,13 +32,11 @@
 		<result column="Version" jdbcType="INTEGER" property="version" />	
 		<association select="selectCreateUser" column="createUserID" property="createUser" javaType="com.iidooo.core.model.po.SecurityUser"></association>
 		<association select="selectChannel" column="channelID" property="channel" javaType="com.iidooo.cms.model.po.CmsChannel"></association>		
+		<collection select="selectPictureList" column="contentID" property="pictureList" ofType="com.iidooo.cms.model.po.CmsPicture"></collection>
 	</resultMap>
 	
 	<resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.iidooo.cms.model.po.CmsContent">
-		<result column="ContentBody" jdbcType="LONGVARCHAR" property="contentBody" />
-		
-
-		<collection select="selectPictureList" column="contentID" property="pictureList" ofType="com.iidooo.cms.model.po.CmsPicture"></collection>
+		<result column="ContentBody" jdbcType="LONGVARCHAR" property="contentBody" />	
 		<collection select="selectTagList" column="contentID" property="tagList" ofType="com.iidooo.cms.model.vo.CmsTagInfo"></collection>
 		
 	</resultMap>
@@ -51,7 +48,7 @@
 	</resultMap>
 
 	<sql id="Base_Column_List">
-		C.ContentID, C.SiteID, C.ChannelID, C.ContentType, C.ContentTitle, C.ContentSubTitle, C.ContentImageTitle,
+		C.ContentID, C.SiteID, C.ChannelID, C.ContentType, C.ContentTitle, C.ContentSubTitle,
 		C.MetaTitle, C.MetaKeywords,
 		C.MetaDescription, C.ContentSummary, C.IsSilent, C.StickyIndex, C.PageViewCount,
 		C.UniqueVisitorCount, C.StarCount, C.CommentCount, C.StartShowDate,
@@ -113,29 +110,30 @@
 	<!-- 根据CmsContent表中的ContentID查询CmsPicture信息 -->
 	<resultMap id="PictureListResultMap" type="com.iidooo.cms.model.po.CmsPicture">
 		<id column="PictureID" jdbcType="INTEGER" property="pictureID" />
-		<result column="ContentID" jdbcType="INTEGER" property="contentID" />
-		<result column="PictureName" jdbcType="VARCHAR" property="pictureName" />
-		<result column="PictureURL" jdbcType="VARCHAR" property="pictureURL" />
-		<result column="Sequence" jdbcType="INTEGER" property="sequence" />
-		<result column="Remarks" jdbcType="VARCHAR" property="remarks" />
-		<result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
-		<result column="CreateUserID" jdbcType="INTEGER" property="createUserID" />
-		<result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
-		<result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID" />
-		<result column="IsDelete" jdbcType="INTEGER" property="isDelete" />
-		<result column="Version" jdbcType="INTEGER" property="version" />
+	    <result column="ContentID" jdbcType="INTEGER" property="contentID" />
+	    <result column="PictureName" jdbcType="VARCHAR" property="pictureName" />
+	    <result column="PictureURL" jdbcType="VARCHAR" property="pictureURL" />
+	    <result column="Href" jdbcType="VARCHAR" property="href" />
+	    <result column="Sequence" jdbcType="INTEGER" property="sequence" />
+	    <result column="Description" jdbcType="VARCHAR" property="description" />
+	    <result column="Remarks" jdbcType="VARCHAR" property="remarks" />
+	    <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
+	    <result column="CreateUserID" jdbcType="INTEGER" property="createUserID" />
+	    <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
+	    <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID" />
+	    <result column="IsDelete" jdbcType="INTEGER" property="isDelete" />
+	    <result column="Version" jdbcType="INTEGER" property="version" />
 	</resultMap>
 	<sql id="Picture_Column_List">
-		P.PictureID, P.ContentID, P.PictureName, P.PictureURL, P.Sequence, P.Remarks, P.CreateTime, P.CreateUserID,
-		P.UpdateTime, P.UpdateUserID,
-		P.IsDelete, P.Version
+		P.PictureID, P.ContentID, P.PictureName, P.PictureURL, P.Href, P.Sequence, P.Description, 
+    	P.Remarks, P.CreateTime, P.CreateUserID, P.UpdateTime, P.UpdateUserID, P.IsDelete, P.Version
 	</sql>
 	<select id="selectPictureList" parameterType="java.lang.Integer" resultMap="PictureListResultMap">
 		select
 		<include refid="Picture_Column_List" />
-		from CMS_PICTURE P
+		from cms_picture P
 		where P.IsDelete = 0 and P.ContentID = #{contentID,jdbcType=INTEGER}
-		order by P.Sequence asc, P.CreateTime desc
+		order by P.Sequence asc
 	</select>
 
 	<select id="selectByContentID" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
@@ -311,9 +309,6 @@
 			<if test="contentSubTitle != null">
 				ContentSubTitle,
 			</if>
-			<if test="contentImageTitle != null">
-				ContentImageTitle,
-			</if>
 			<if test="metaTitle != null">
 				MetaTitle,
 			</if>
@@ -391,9 +386,6 @@
 			</if>
 			<if test="contentSubTitle != null">
 				#{contentSubTitle,jdbcType=VARCHAR},
-			</if>
-			<if test="contentImageTitle != null">
-				#{contentImageTitle,jdbcType=VARCHAR},
 			</if>
 			<if test="metaTitle != null">
 				#{metaTitle,jdbcType=VARCHAR},
@@ -477,9 +469,6 @@
 			</if>
 			<if test="contentSubTitle != null">
 				ContentSubTitle = #{contentSubTitle,jdbcType=VARCHAR},
-			</if>
-			<if test="contentImageTitle != null">
-				ContentImageTitle = #{contentImageTitle,jdbcType=VARCHAR},
 			</if>
 			<if test="metaTitle != null">
 				MetaTitle = #{metaTitle,jdbcType=VARCHAR},
@@ -590,7 +579,7 @@
 		(select * from
 		(select
 		C1.ContentID, C1.ChannelID, C1.ContentType, C1.ContentTitle, C1.ContentSubTitle, 
-		C1.ContentImageTitle, C1.MetaTitle, C1.MetaKeywords,
+		C1.MetaTitle, C1.MetaKeywords,
 		C1.MetaDescription, C1.ContentSummary, C1.IsSilent, C1.StickyIndex, C1.PageViewCount,
 		C1.UniqueVisitorCount, C1.StarCount, C1.CommentCount, C1.StartShowDate, C1.StartShowTime, 
     	C1.EndShowDate, C1.EndShowTime, C1.Status, C1.Remarks, C1.CreateTime, C1.CreateUserID, 
@@ -623,7 +612,7 @@
 		(select * from
 		(select 
 			C2.ContentID, C2.ChannelID, C2.ContentType, C2.ContentTitle, C2.ContentSubTitle, 
-			C2.ContentImageTitle, C2.MetaTitle, C2.MetaKeywords,
+			C2.MetaTitle, C2.MetaKeywords,
 			C2.MetaDescription, C2.ContentSummary, C2.IsSilent, C2.StickyIndex, C2.PageViewCount,
 			C2.UniqueVisitorCount, C2.StarCount, C2.CommentCount, C2.StartShowDate, C2.StartShowTime, 
 	    	C2.EndShowDate, C2.EndShowTime, C2.Status, C2.Remarks, C2.CreateTime, C2.CreateUserID, 

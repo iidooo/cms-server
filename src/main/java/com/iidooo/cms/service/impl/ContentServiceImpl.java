@@ -38,7 +38,7 @@ public class ContentServiceImpl implements ContentService {
 
     @Autowired
     private CmsContentMapper cmsContentDao;
-    
+
     @Autowired
     private CmsContentFileMapper contentFileMapper;
 
@@ -100,9 +100,9 @@ public class ContentServiceImpl implements ContentService {
             throw e;
         }
     }
-    
+
     @Override
-    public CmsContent getContent(String siteCode, String channelPath){
+    public CmsContent getContent(String siteCode, String channelPath) {
         try {
             CmsContent result = null;
 
@@ -203,17 +203,17 @@ public class ContentServiceImpl implements ContentService {
             throw e;
         }
     }
-    
+
     @Override
-    public int getContentListCount(CmsContent content){
+    public int getContentListCount(CmsContent content) {
         try {
             int result = 0;
-            
+
             if (content.getContentType() != null && content.getContentType().equals(ContentType.File.getCode())) {
                 result = contentFileMapper.selectContentListCount(content);
             } else {
                 result = cmsContentDao.selectContentListCount(content);
-            }           
+            }
 
             return result;
         } catch (Exception e) {
@@ -226,7 +226,7 @@ public class ContentServiceImpl implements ContentService {
     public List<CmsContent> getContentList(CmsContent content, Page page) {
         try {
             List<CmsContent> result = null;
-            
+
             if (content.getContentType() != null && content.getContentType().equals(ContentType.File.getCode())) {
                 result = contentFileMapper.selectContentList(content, page);
             } else {
@@ -255,6 +255,16 @@ public class ContentServiceImpl implements ContentService {
                 }
             }
 
+            for (CmsPicture picture : content.getPictureList()) {
+                picture.setCreateTime(new Date());
+                picture.setCreateUserID(content.getCreateUserID());
+                picture.setUpdateUserID(content.getCreateUserID());
+                picture.setContentID(content.getContentID());
+                if (cmsPictureDao.insert(picture) <= 0) {
+                    throw new Exception();
+                }
+            }
+
             result = cmsContentDao.selectByContentID(content.getContentID());
         } catch (Exception e) {
             logger.fatal(e);
@@ -264,7 +274,8 @@ public class ContentServiceImpl implements ContentService {
 
     @Override
     @Transactional
-    public boolean updateContent(CmsContent content, boolean isPicutureListUpdate) throws Exception {
+    public CmsContent updateContent(CmsContent content) {
+        CmsContent result = null;
         try {
             if (cmsContentDao.updateByContentID(content) <= 0) {
                 throw new Exception();
@@ -279,13 +290,16 @@ public class ContentServiceImpl implements ContentService {
                 }
             }
 
-            if (isPicutureListUpdate) {
-                // 为了处理直观，先全部删除再新建
-                cmsPictureDao.deleteByContentID(content.getContentID());
-                for (CmsPicture picture : content.getPictureList()) {
+            for (CmsPicture picture : content.getPictureList()) {
+                if (picture.getPictureID() != null) {
+                    picture.setContentID(content.getContentID());
+                    picture.setUpdateUserID(content.getCreateUserID());
+                    if (cmsPictureDao.updateByPictureID(picture) <= 0) {
+                        throw new Exception();
+                    }
+                } else {
                     picture.setCreateTime(new Date());
                     picture.setCreateUserID(content.getCreateUserID());
-                    picture.setUpdateTime(new Date());
                     picture.setUpdateUserID(content.getCreateUserID());
                     picture.setContentID(content.getContentID());
                     if (cmsPictureDao.insert(picture) <= 0) {
@@ -293,12 +307,11 @@ public class ContentServiceImpl implements ContentService {
                     }
                 }
             }
-            return true;
+            result = cmsContentDao.selectByContentID(content.getContentID());
         } catch (Exception e) {
-            e.printStackTrace();
             logger.fatal(e);
-            throw e;
         }
+        return result;
     }
 
     @Override

@@ -11,7 +11,12 @@ public interface CmsSiteMapper {
 
     int insertSelective(CmsSite record);
 
-    CmsSite selectByPrimaryKey(Integer siteID);
+    /**
+     * 通过站点ID获取站点对象
+     * @param siteID 站点ID
+     * @return 站点对象
+     */
+    CmsSite selectBySiteID(Integer siteID);
     
     /**
      * 查询获取拥有者的站点列表

@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,12 +36,9 @@ import com.iidooo.core.enums.ResponseStatus;
 import com.iidooo.core.model.Message;
 import com.iidooo.core.model.Page;
 import com.iidooo.core.model.ResponseResult;
-import com.iidooo.core.model.po.SecurityUser;
 import com.iidooo.core.service.DictItemService;
 import com.iidooo.core.service.HisOperatorService;
 import com.iidooo.core.service.SecurityUserService;
-import com.iidooo.core.util.DateUtil;
-import com.iidooo.core.util.FileUtil;
 import com.iidooo.core.util.PageUtil;
 import com.iidooo.core.util.StringUtil;
 import com.iidooo.core.util.ValidateUtil;
@@ -435,7 +433,8 @@ public class ContentController {
             String contentSubTitle = request.getParameter("contentSubTitle");
             String contentSummary = request.getParameter("contentSummary");
             String contentBody = request.getParameter("contentBody");
-
+            String pictureList = request.getParameter("pictureList");
+            
             // 工厂创建对象
             CmsContent content = null;
             if (contentType.equals(ContentType.Default.getCode())) {
@@ -465,6 +464,20 @@ public class ContentController {
             content.setCreateUserID(Integer.parseInt(userID));
             content.setUpdateUserID(Integer.parseInt(userID));
 
+            // 创建图片列表
+            if (StringUtil.isNotBlank(pictureList)) {
+                JSONArray jsonArray = JSONArray.fromObject(pictureList);
+                for (Object object : jsonArray) {
+                    JSONObject jsonObject = (JSONObject)object;
+                    String pictureURL = jsonObject.getString("pictureURL");
+                    String pictureName = jsonObject.getString("pictureName");
+                    CmsPicture picture = new CmsPicture();
+                    picture.setPictureName(pictureName);
+                    picture.setPictureURL(pictureURL);
+                    content.getPictureList().add(picture);
+                }
+            }
+            
             content = contentService.createContent(content);
             if (content != null) {
                 result.setStatus(ResponseStatus.OK.getCode());
@@ -487,42 +500,22 @@ public class ContentController {
         try {
             // 解析获得传入的参数
             // 必填参数
-            String contentIDStr = request.getParameter("contentID");
-            String channelIDStr = request.getParameter("channelID");
-            String userIDStr = request.getParameter("userID");
+            String siteID = request.getParameter("siteID");
+            String contentID = request.getParameter("contentID");
+            String channelID = request.getParameter("channelID");
+            String userID = request.getParameter("userID");
             String contentType = request.getParameter("contentType");
 
-            if (StringUtil.isBlank(contentIDStr)) {
-                Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "contentID");
-                result.getMessages().add(message);
-            } else if (!ValidateUtil.isMatch(contentIDStr, RegularConstant.REGEX_NUMBER)) {
-                Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "contentID");
-                result.getMessages().add(message);
-            }
-
-            if (StringUtil.isBlank(channelIDStr)) {
-                Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "channelID");
-                result.getMessages().add(message);
-            } else if (!ValidateUtil.isMatch(channelIDStr, RegularConstant.REGEX_NUMBER)) {
-                Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "channelID");
-                result.getMessages().add(message);
-            }
-
-            if (StringUtil.isBlank(userIDStr)) {
-                Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "userID");
-                result.getMessages().add(message);
-            } else if (!ValidateUtil.isMatch(userIDStr, RegularConstant.REGEX_NUMBER)) {
-                Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "userID");
-                result.getMessages().add(message);
-            }
-
-            if (StringUtil.isBlank(contentType)) {
-                Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "contentType");
-                result.getMessages().add(message);
-            } else if (!ValidateUtil.isMatch(contentType, RegularConstant.REGEX_NUMBER)) {
-                Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "contentType");
-                result.getMessages().add(message);
-            }
+            result.checkFieldRequired("siteID", siteID);
+            result.checkFieldInteger("siteID", siteID);
+            result.checkFieldRequired("contentID", contentID);
+            result.checkFieldInteger("contentID", contentID);
+            result.checkFieldRequired("channelID", channelID);
+            result.checkFieldInteger("channelID", channelID);
+            result.checkFieldRequired("userID", userID);
+            result.checkFieldInteger("userID", userID);
+            result.checkFieldRequired("contentType", contentType);
+            result.checkFieldInteger("contentType", contentType);
 
             if (result.getMessages().size() > 0) {
                 // 验证失败，返回message
@@ -530,28 +523,12 @@ public class ContentController {
                 return result;
             }
 
-            int contentID = Integer.parseInt(contentIDStr);
-            int channelID = Integer.parseInt(channelIDStr);
-            int userID = Integer.parseInt(userIDStr);
-
-            // 获取可选参数
+         // 获取可选参数
             String contentTitle = request.getParameter("contentTitle");
             String contentSubTitle = request.getParameter("contentSubTitle");
-            String contentImageTitle = request.getParameter("contentImageTitle");
-            String metaTitle = request.getParameter("metaTitle");
-            String metaKeywords = request.getParameter("metaKeywords");
-            String metaDescription = request.getParameter("metaDescription");
             String contentSummary = request.getParameter("contentSummary");
             String contentBody = request.getParameter("contentBody");
-            String isSilent = request.getParameter("isSilent");
-            String stickyIndex = request.getParameter("stickyIndex");
-            String remarks = request.getParameter("remarks");
-            String startShowDate = request.getParameter("startShowDate");
-            String startShowTime = request.getParameter("startShowTime");
-            String endShowDate = request.getParameter("endShowDate");
-            String endShowTime = request.getParameter("endShowTime");
-            String pictureListStr = request.getParameter("pictureList");
-            String status = request.getParameter("status");
+            String pictureList = request.getParameter("pictureList");
 
             // 工厂创建对象
             CmsContent content = null;
@@ -561,86 +538,53 @@ public class ContentController {
                 content = new CmsContentNews();
 
                 // 设置CmsContentNews参数
+                String author = request.getParameter("author");
                 String source = request.getParameter("source");
                 String sourceURL = request.getParameter("sourceURL");
                 CmsContentNews contentNews = (CmsContentNews) content;
+                contentNews.setAuthor(author);
                 contentNews.setSource(source);
                 contentNews.setSourceURL(sourceURL);
             }
 
             // 设置CmsContent属性
-            content.setContentID(contentID);
-            content.setChannelID(channelID);
+            content.setSiteID(Integer.parseInt(siteID));
+            content.setContentID(Integer.parseInt(contentID));
+            content.setChannelID(Integer.parseInt(channelID));
             content.setContentType(contentType);
             content.setContentTitle(contentTitle);
-            content.setMetaKeywords(metaKeywords);
             content.setContentSubTitle(contentSubTitle);
-            content.setContentImageTitle(contentImageTitle);
-            content.setMetaTitle(metaTitle);
-            content.setMetaDescription(metaDescription);
             content.setContentSummary(contentSummary);
             content.setContentBody(contentBody);
-            if (StringUtil.isNotBlank(isSilent) && ValidateUtil.isMatch(isSilent, RegularConstant.REGEX_NUMBER)) {
-                content.setIsSilent(Integer.parseInt(isSilent));
-            }
-            if (StringUtil.isNotBlank(stickyIndex) && ValidateUtil.isMatch(stickyIndex, RegularConstant.REGEX_NUMBER)) {
-                content.setStickyIndex(Integer.parseInt(stickyIndex));
-            }
+            content.setCreateTime(new Date());
+            content.setCreateUserID(Integer.parseInt(userID));
+            content.setUpdateUserID(Integer.parseInt(userID));
 
-            if (DateUtil.isFormat(startShowDate, DateUtil.DATE_HYPHEN)) {
-                content.setStartShowDate(startShowDate);
-            } else if (DateUtil.isFormat(startShowDate, DateUtil.DATE_TIME_HYPHEN)) {
-                content.setStartShowDate(DateUtil.format(startShowDate, DateUtil.DATE_TIME_HYPHEN, DateUtil.DATE_HYPHEN));
-            }
-            if (DateUtil.isFormat(startShowTime, DateUtil.TIME_COLON)) {
-                content.setStartShowTime(startShowTime);
-            } else if (DateUtil.isFormat(startShowTime, DateUtil.DATE_TIME_HYPHEN)) {
-                content.setStartShowTime(DateUtil.format(startShowTime, DateUtil.DATE_TIME_HYPHEN, DateUtil.TIME_COLON));
-            }
-            if (DateUtil.isFormat(endShowDate, DateUtil.DATE_HYPHEN)) {
-                content.setEndShowDate(endShowDate);
-            } else if (DateUtil.isFormat(endShowDate, DateUtil.DATE_TIME_HYPHEN)) {
-                content.setEndShowDate(DateUtil.format(endShowDate, DateUtil.DATE_TIME_HYPHEN, DateUtil.DATE_HYPHEN));
-            }
-            if (DateUtil.isFormat(endShowTime, DateUtil.TIME_COLON)) {
-                content.setEndShowTime(endShowTime);
-            } else if (DateUtil.isFormat(endShowTime, DateUtil.DATE_TIME_HYPHEN)) {
-                content.setEndShowTime(DateUtil.format(endShowTime, DateUtil.DATE_TIME_HYPHEN, DateUtil.TIME_COLON));
-            }
-
-            if (StringUtil.isNotBlank(status) && ValidateUtil.isMatch(status, RegularConstant.REGEX_NUMBER)) {
-                content.setStatus(status);
-            }
-
-            content.setRemarks(remarks);
-            content.setUpdateTime(new Date());
-            content.setUpdateUserID(userID);
-
-            boolean isPicutureListUpdate = false;
-            if (StringUtil.isNotBlank(pictureListStr)) {
-                JSONArray jsonArray = JSONArray.fromObject(pictureListStr);
+            // 创建图片列表
+            if (StringUtil.isNotBlank(pictureList)) {
+                JSONArray jsonArray = JSONArray.fromObject(pictureList);
                 for (Object object : jsonArray) {
-                    String pictureURL = object.toString();
-                    String pictureName = FileUtil.getFileName(pictureURL);
+                    JSONObject jsonObject = (JSONObject)object;
+                    String pictureID = jsonObject.getString("pictureID");
+                    String pictureURL = jsonObject.getString("pictureURL");
+                    String pictureName = jsonObject.getString("pictureName");
                     CmsPicture picture = new CmsPicture();
+                    if (StringUtil.isNotBlank(pictureID) && ValidateUtil.isMatch(pictureID, RegularConstant.REGEX_NUMBER)) {
+                        picture.setPictureID(Integer.parseInt(pictureID));
+                    }
                     picture.setPictureName(pictureName);
                     picture.setPictureURL(pictureURL);
                     content.getPictureList().add(picture);
                 }
-                isPicutureListUpdate = true;
             }
 
-            if (contentService.updateContent(content, isPicutureListUpdate)) {
-                content = contentService.getContent(content.getContentID());
-            }
+            content = contentService.updateContent(content);
 
-            if (content == null) {
-                result.setStatus(ResponseStatus.UpdateFailed.getCode());
-            } else {
+            if (content != null) {
                 result.setStatus(ResponseStatus.OK.getCode());
                 result.setData(content);
-                // 更新浏览记录
-                hisOperatorService.createHisOperator(TableName.CMS_CONTENT.toString(), content.getContentID(), request);
+            } else {
+                result.setStatus(ResponseStatus.UpdateFailed.getCode());
             }
 
         } catch (Exception e) {

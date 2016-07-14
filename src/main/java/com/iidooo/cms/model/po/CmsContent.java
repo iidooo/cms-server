@@ -23,8 +23,6 @@ public class CmsContent {
 
     private String contentSubTitle;
 
-    private String contentImageTitle;
-
     private String metaTitle;
 
     private String metaKeywords;
@@ -70,9 +68,12 @@ public class CmsContent {
     private Integer version;
 
     private String contentBody;
+
+    private List<CmsPicture> pictureList;
     
     public CmsContent(){
         this.channel = new CmsChannel();
+        pictureList = new ArrayList<CmsPicture>();
     }
     
     public Integer getContentID() {
@@ -129,14 +130,6 @@ public class CmsContent {
 
     public void setContentSubTitle(String contentSubTitle) {
         this.contentSubTitle = contentSubTitle == null ? null : contentSubTitle.trim();
-    }
-
-    public String getContentImageTitle() {
-        return contentImageTitle;
-    }
-
-    public void setContentImageTitle(String contentImageTitle) {
-        this.contentImageTitle = contentImageTitle == null ? null : contentImageTitle.trim();
     }
 
     public String getMetaTitle() {
@@ -321,14 +314,10 @@ public class CmsContent {
 
     public void setContentBody(String contentBody) {
         this.contentBody = contentBody == null ? null : contentBody.trim();
-    }
-    
-    private List<CmsPicture> pictureList;
+    }   
+
 
     public List<CmsPicture> getPictureList() {
-        if (pictureList == null) {
-            pictureList = new ArrayList<CmsPicture>();
-        }
         return pictureList;
     }
 

@@ -28,6 +28,15 @@ public class SiteServiceImpl implements SiteService {
         }
         return result;
     }
-    
-    
+
+    @Override
+    public CmsSite getSite(Integer siteID) {
+        CmsSite result = null;
+        try {
+            result = siteMapper.selectBySiteID(siteID);
+        } catch (Exception e) {
+            logger.fatal(e);
+        }
+        return result;
+    }   
 }
