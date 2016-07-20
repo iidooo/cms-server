@@ -25,6 +25,7 @@ import com.iidooo.cms.enums.ContentType;
 import com.iidooo.cms.enums.TableName;
 import com.iidooo.cms.model.po.CmsContent;
 import com.iidooo.cms.model.po.CmsContentNews;
+import com.iidooo.cms.model.po.CmsFile;
 import com.iidooo.cms.model.po.CmsPicture;
 import com.iidooo.cms.model.vo.SearchCondition;
 import com.iidooo.cms.service.ContentService;
@@ -39,6 +40,7 @@ import com.iidooo.core.model.ResponseResult;
 import com.iidooo.core.service.DictItemService;
 import com.iidooo.core.service.HisOperatorService;
 import com.iidooo.core.service.SecurityUserService;
+import com.iidooo.core.util.FileUtil;
 import com.iidooo.core.util.PageUtil;
 import com.iidooo.core.util.StringUtil;
 import com.iidooo.core.util.ValidateUtil;
@@ -313,19 +315,20 @@ public class ContentController {
             result.setStatus(ResponseStatus.OK.getCode());
             result.setData(content);
 
-            // 更新浏览记录
-            hisOperatorService.createHisOperator(TableName.CMS_CONTENT.toString(), content.getContentID(), request);
+            if (request.getServletPath().equals("/getContent")) {
+                // 更新浏览记录
+                hisOperatorService.createHisOperator(TableName.CMS_CONTENT.toString(), content.getContentID(), request);
 
-            // 更新该内容的PV和UV
-            List<String> optionList = new ArrayList<String>();
-            optionList.add(request.getServletPath().substring(1));
-            optionList.add("content/" + content.getContentID());
-            int pvCount = content.getPageViewCount() + 1;
-            int uvCount = hisOperatorService.getUVCount(TableName.CMS_CONTENT.toString(), content.getContentID(), optionList);
-            contentService.updateViewCount(content.getContentID(), pvCount, uvCount);
-            content.setPageViewCount(pvCount);
-            content.setUniqueVisitorCount(uvCount);
-
+                // 更新该内容的PV和UV
+                List<String> optionList = new ArrayList<String>();
+                optionList.add(request.getServletPath().substring(1));
+                optionList.add("content/" + content.getContentID());
+                int pvCount = content.getPageViewCount() + 1;
+                int uvCount = hisOperatorService.getUVCount(TableName.CMS_CONTENT.toString(), content.getContentID(), optionList);
+                contentService.updateViewCount(content.getContentID(), pvCount, uvCount);
+                content.setPageViewCount(pvCount);
+                content.setUniqueVisitorCount(uvCount);
+            }
         } catch (Exception e) {
 
             logger.fatal(e);
@@ -412,7 +415,7 @@ public class ContentController {
             String channelID = request.getParameter("channelID");
             String userID = request.getParameter("userID");
             String contentType = request.getParameter("contentType");
-            
+
             result.checkFieldRequired("siteID", siteID);
             result.checkFieldInteger("siteID", siteID);
             result.checkFieldRequired("channelID", channelID);
@@ -431,10 +434,10 @@ public class ContentController {
             // 获取可选参数
             String contentTitle = request.getParameter("contentTitle");
             String contentSubTitle = request.getParameter("contentSubTitle");
+            String contentImageTitle = request.getParameter("contentImageTitle");
             String contentSummary = request.getParameter("contentSummary");
             String contentBody = request.getParameter("contentBody");
-            String pictureList = request.getParameter("pictureList");
-            
+
             // 工厂创建对象
             CmsContent content = null;
             if (contentType.equals(ContentType.Default.getCode())) {
@@ -458,26 +461,13 @@ public class ContentController {
             content.setContentType(contentType);
             content.setContentTitle(contentTitle);
             content.setContentSubTitle(contentSubTitle);
+            content.setContentImageTitle(contentImageTitle);
             content.setContentSummary(contentSummary);
             content.setContentBody(contentBody);
             content.setCreateTime(new Date());
             content.setCreateUserID(Integer.parseInt(userID));
             content.setUpdateUserID(Integer.parseInt(userID));
 
-            // 创建图片列表
-            if (StringUtil.isNotBlank(pictureList)) {
-                JSONArray jsonArray = JSONArray.fromObject(pictureList);
-                for (Object object : jsonArray) {
-                    JSONObject jsonObject = (JSONObject)object;
-                    String pictureURL = jsonObject.getString("pictureURL");
-                    String pictureName = jsonObject.getString("pictureName");
-                    CmsPicture picture = new CmsPicture();
-                    picture.setPictureName(pictureName);
-                    picture.setPictureURL(pictureURL);
-                    content.getPictureList().add(picture);
-                }
-            }
-            
             content = contentService.createContent(content);
             if (content != null) {
                 result.setStatus(ResponseStatus.OK.getCode());
@@ -523,12 +513,12 @@ public class ContentController {
                 return result;
             }
 
-         // 获取可选参数
+            // 获取可选参数
             String contentTitle = request.getParameter("contentTitle");
             String contentSubTitle = request.getParameter("contentSubTitle");
+            String contentImageTitle = request.getParameter("contentImageTitle");
             String contentSummary = request.getParameter("contentSummary");
             String contentBody = request.getParameter("contentBody");
-            String pictureList = request.getParameter("pictureList");
 
             // 工厂创建对象
             CmsContent content = null;
@@ -554,29 +544,12 @@ public class ContentController {
             content.setContentType(contentType);
             content.setContentTitle(contentTitle);
             content.setContentSubTitle(contentSubTitle);
+            content.setContentImageTitle(contentImageTitle);
             content.setContentSummary(contentSummary);
             content.setContentBody(contentBody);
             content.setCreateTime(new Date());
             content.setCreateUserID(Integer.parseInt(userID));
             content.setUpdateUserID(Integer.parseInt(userID));
-
-            // 创建图片列表
-            if (StringUtil.isNotBlank(pictureList)) {
-                JSONArray jsonArray = JSONArray.fromObject(pictureList);
-                for (Object object : jsonArray) {
-                    JSONObject jsonObject = (JSONObject)object;
-                    String pictureID = jsonObject.getString("pictureID");
-                    String pictureURL = jsonObject.getString("pictureURL");
-                    String pictureName = jsonObject.getString("pictureName");
-                    CmsPicture picture = new CmsPicture();
-                    if (StringUtil.isNotBlank(pictureID) && ValidateUtil.isMatch(pictureID, RegularConstant.REGEX_NUMBER)) {
-                        picture.setPictureID(Integer.parseInt(pictureID));
-                    }
-                    picture.setPictureName(pictureName);
-                    picture.setPictureURL(pictureURL);
-                    content.getPictureList().add(picture);
-                }
-            }
 
             content = contentService.updateContent(content);
 

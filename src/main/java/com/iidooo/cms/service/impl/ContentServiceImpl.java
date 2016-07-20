@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.iidooo.cms.constant.CmsDictContant;
 import com.iidooo.cms.enums.ContentType;
 import com.iidooo.cms.mapper.CmsCommentMapper;
-import com.iidooo.cms.mapper.CmsContentFileMapper;
 import com.iidooo.cms.mapper.CmsContentMapper;
 import com.iidooo.cms.mapper.CmsContentNewsMapper;
 import com.iidooo.cms.mapper.CmsFavoriteMapper;
@@ -38,9 +37,6 @@ public class ContentServiceImpl implements ContentService {
 
     @Autowired
     private CmsContentMapper cmsContentDao;
-
-    @Autowired
-    private CmsContentFileMapper contentFileMapper;
 
     @Autowired
     private CmsContentNewsMapper cmsContentNewsDao;
@@ -206,37 +202,26 @@ public class ContentServiceImpl implements ContentService {
 
     @Override
     public int getContentListCount(CmsContent content) {
+        int result = 0;
         try {
-            int result = 0;
-
-            if (content.getContentType() != null && content.getContentType().equals(ContentType.File.getCode())) {
-                result = contentFileMapper.selectContentListCount(content);
-            } else {
-                result = cmsContentDao.selectContentListCount(content);
-            }
-
-            return result;
+            result = cmsContentDao.selectContentListCount(content);
         } catch (Exception e) {
             logger.fatal(e);
             throw e;
         }
+        return result;
     }
 
     @Override
     public List<CmsContent> getContentList(CmsContent content, Page page) {
+        List<CmsContent> result = new ArrayList<CmsContent>();
         try {
-            List<CmsContent> result = null;
-
-            if (content.getContentType() != null && content.getContentType().equals(ContentType.File.getCode())) {
-                result = contentFileMapper.selectContentList(content, page);
-            } else {
-                result = cmsContentDao.selectContentList(content, page);
-            }
-            return result;
+            result = cmsContentDao.selectContentList(content, page);
         } catch (Exception e) {
             logger.fatal(e);
             throw e;
         }
+        return result;
     }
 
     @Override
@@ -255,17 +240,7 @@ public class ContentServiceImpl implements ContentService {
                 }
             }
 
-            for (CmsPicture picture : content.getPictureList()) {
-                picture.setCreateTime(new Date());
-                picture.setCreateUserID(content.getCreateUserID());
-                picture.setUpdateUserID(content.getCreateUserID());
-                picture.setContentID(content.getContentID());
-                if (cmsPictureDao.insert(picture) <= 0) {
-                    throw new Exception();
-                }
-            }
-
-            result = cmsContentDao.selectByContentID(content.getContentID());
+            result = getContent(content.getContentID());
         } catch (Exception e) {
             logger.fatal(e);
         }
@@ -289,25 +264,8 @@ public class ContentServiceImpl implements ContentService {
                     }
                 }
             }
-
-            for (CmsPicture picture : content.getPictureList()) {
-                if (picture.getPictureID() != null) {
-                    picture.setContentID(content.getContentID());
-                    picture.setUpdateUserID(content.getCreateUserID());
-                    if (cmsPictureDao.updateByPictureID(picture) <= 0) {
-                        throw new Exception();
-                    }
-                } else {
-                    picture.setCreateTime(new Date());
-                    picture.setCreateUserID(content.getCreateUserID());
-                    picture.setUpdateUserID(content.getCreateUserID());
-                    picture.setContentID(content.getContentID());
-                    if (cmsPictureDao.insert(picture) <= 0) {
-                        throw new Exception();
-                    }
-                }
-            }
-            result = cmsContentDao.selectByContentID(content.getContentID());
+            
+            result = getContent(content.getContentID());
         } catch (Exception e) {
             logger.fatal(e);
         }

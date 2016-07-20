@@ -49,5 +49,4 @@ public class ChannelUtil {
         }
         return result;
     }
-
 }

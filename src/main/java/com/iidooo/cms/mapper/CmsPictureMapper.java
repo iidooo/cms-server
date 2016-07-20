@@ -1,15 +1,10 @@
 package com.iidooo.cms.mapper;
 
+import java.util.List;
+
 import com.iidooo.cms.model.po.CmsPicture;
 
 public interface CmsPictureMapper {
-    
-    /**
-     * 根据内容ID把图片列表删掉
-     * @param contentID 内容ID
-     * @return 所影响的行数
-     */
-    int deleteByContentID(Integer contentID);
 
     /**
      * 插入图片数据
@@ -17,13 +12,32 @@ public interface CmsPictureMapper {
      * @return 所影响的行数
      */
     int insert(CmsPicture picture);
+    
+    /**
+     * 根据ContentID获取图片列表
+     * @param contentID 内容ID
+     * @return 所获的的图片列表
+     */
+    List<CmsPicture> selectByContentID(Integer contentID);
 
-    CmsPicture selectByPrimaryKey(Integer pictureID);
+    /**
+     * 通过PictureID获取图片
+     * @param pictureID 图片ID
+     * @return 所获的图片对象
+     */
+    CmsPicture selectByPictureID(Integer pictureID);
     
     /**
      * 通过PictureID更新
-     * @param picture
+     * @param picture 要更新的图片对象
      * @return 所影响的行数
      */
-    int updateByPictureID(CmsPicture picture);
+    int updateByPictureID(CmsPicture picture);    
+
+    /**
+     * 根据PictureID把内容图片删掉
+     * @param picture 要删除的图片对象
+     * @return 所影响的行数
+     */
+    int deleteByPictureID(CmsPicture picture);
 }

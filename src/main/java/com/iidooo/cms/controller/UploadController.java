@@ -48,6 +48,7 @@ public class UploadController {
     @RequestMapping(value = { "/uploadFile", "/admin/uploadFile" }, method = RequestMethod.POST)
     public ResponseResult uploadFile(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
+        OSSClient ossClient = null;
         try {
             ServletContext sc = request.getServletContext();
 
@@ -78,6 +79,7 @@ public class UploadController {
             if (StringUtil.isBlank(uploadFilePath)) {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("url", "");
+                jsonObject.put("size", 0);
                 result.setStatus(ResponseStatus.Failed.getCode());
                 result.setData(jsonObject);
                 return result;
@@ -86,7 +88,7 @@ public class UploadController {
             String isCompress = multipartRequest.getParameter("isCompress");
             String width = multipartRequest.getParameter("width");
             String height = multipartRequest.getParameter("height");
-            if (isCompress.equals("true")) {
+            if (StringUtil.isNotBlank(isCompress) && isCompress.equals("true")) {
                 PictureUtil.compress(uploadFilePath, uploadFilePath, Integer.parseInt(width), Integer.parseInt(height), true);
             }
             // if (PictureUtil.isImage(uploadFilePath)) {
@@ -107,6 +109,7 @@ public class UploadController {
             if (site == null) {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("url", "");
+                jsonObject.put("size", file.getSize());
                 result.setStatus(ResponseStatus.Failed.getCode());
                 result.setData(jsonObject);
                 return result;
@@ -114,19 +117,24 @@ public class UploadController {
             
             // 把文件上传到阿里云OSS的既定路径下
             Properties aliyunProperties = (Properties) sc.getAttribute("aliyun.properties");
-
-            OSSClient ossClient = OSSUtil.getOSSClient(aliyunProperties);
+            String domain = aliyunProperties.getProperty("ALIYUN_OSS_DOMAIN");
+            
+            ossClient = OSSUtil.getOSSClient(aliyunProperties);
             String newKeyURL = OSSUtil.uploadFile(aliyunProperties, ossClient, site.getSiteCode() + "/" + yearMonth + "/", uploadFilePath);
-
+            long size = OSSUtil.getFileSize(aliyunProperties, ossClient, newKeyURL.replace(domain, ""));
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("url", newKeyURL);
-
+            jsonObject.put("size", size);
             result.setStatus(ResponseStatus.OK.getCode());
             result.setData(jsonObject);
 
         } catch (Exception e) {
             logger.fatal(e);
             result.checkException(e);
+        } finally{
+            if (ossClient != null) {
+                ossClient.shutdown();
+            }
         }
         return result;
     }

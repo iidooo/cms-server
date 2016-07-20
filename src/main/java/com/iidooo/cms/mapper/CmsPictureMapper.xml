@@ -1,135 +1,151 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.iidooo.cms.mapper.CmsPictureMapper">
-  <resultMap id="BaseResultMap" type="com.iidooo.cms.model.po.CmsPicture">
-    <id column="PictureID" jdbcType="INTEGER" property="pictureID" />
-    <result column="ContentID" jdbcType="INTEGER" property="contentID" />
-    <result column="PictureName" jdbcType="VARCHAR" property="pictureName" />
-    <result column="PictureURL" jdbcType="VARCHAR" property="pictureURL" />
-    <result column="Href" jdbcType="VARCHAR" property="href" />
-    <result column="Sequence" jdbcType="INTEGER" property="sequence" />
-    <result column="Description" jdbcType="VARCHAR" property="description" />
-    <result column="Remarks" jdbcType="VARCHAR" property="remarks" />
-    <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="CreateUserID" jdbcType="INTEGER" property="createUserID" />
-    <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID" />
-    <result column="IsDelete" jdbcType="INTEGER" property="isDelete" />
-    <result column="Version" jdbcType="INTEGER" property="version" />
-  </resultMap>
-  <sql id="Base_Column_List">
-    P.PictureID, P.ContentID, P.PictureName, P.PictureURL, P.Href, P.Sequence, P.Description, 
-    P.Remarks, P.CreateTime, P.CreateUserID, P.UpdateTime, P.UpdateUserID, P.IsDelete, P.Version
-  </sql>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select 
-    <include refid="Base_Column_List" />
-    from cms_picture
-    where PictureID = #{pictureID,jdbcType=INTEGER}
-  </select>
-  
-  <!-- 根据内容ID把图片列表删掉 -->
-  <delete id="deleteByContentID" parameterType="java.lang.Integer">
-    delete from cms_picture
-    where ContentID = #{contentID,jdbcType=INTEGER}
-  </delete>
-  
-  <!-- 插入图片数据 -->
-  <insert id="insert" useGeneratedKeys="true" keyProperty="pictureID" parameterType="com.iidooo.cms.model.po.CmsPicture">
-    insert into cms_picture
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="contentID != null">
-        ContentID,
-      </if>
-      <if test="pictureName != null">
-        PictureName,
-      </if>
-      <if test="pictureURL != null">
-        PictureURL,
-      </if>      
-      <if test="href != null">
-        Href,
-      </if>
-        Sequence,
-      <if test="description != null">
-        Description,
-      </if>
-      <if test="remarks != null">
-        Remarks,
-      </if>
-      <if test="createTime != null">
-        CreateTime,
-      </if>
-      <if test="createUserID != null">
-        CreateUserID,
-      </if>
-      <if test="updateUserID != null">
-        UpdateUserID,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="contentID != null">
-        #{contentID,jdbcType=INTEGER},
-      </if>
-      <if test="pictureName != null">
-        #{pictureName,jdbcType=VARCHAR},
-      </if>
-      <if test="pictureURL != null">
-        #{pictureURL,jdbcType=VARCHAR},
-      </if>
-      <if test="href != null">
-        #{href,jdbcType=VARCHAR},
-      </if>
-      (select ifnull(Max(Sequence),0) from cms_picture P where P.ContentID = #{contentID,jdbcType=INTEGER} and P.IsDelete = 0) + 1,
-      <if test="description != null">
-        #{description,jdbcType=VARCHAR},
-      </if>
-      <if test="remarks != null">
-        #{remarks,jdbcType=VARCHAR},
-      </if>
-      <if test="createTime != null">
-        #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="createUserID != null">
-        #{createUserID,jdbcType=INTEGER},
-      </if>
-      <if test="updateUserID != null">
-        #{updateUserID,jdbcType=INTEGER},
-      </if>
-    </trim>
-  </insert>
-  
-  <!-- 通过PictureID更新 -->
-  <update id="updateByPictureID" parameterType="com.iidooo.cms.model.po.CmsPicture">
-    update cms_picture
-    <set>
-      <if test="contentID != null">
-        ContentID = #{contentID,jdbcType=INTEGER},
-      </if>
-      <if test="pictureName != null">
-        PictureName = #{pictureName,jdbcType=VARCHAR},
-      </if>
-      <if test="pictureURL != null">
-        PictureURL = #{pictureURL,jdbcType=VARCHAR},
-      </if>
-      <if test="href != null">
-        Href = #{href,jdbcType=VARCHAR},
-      </if>
-      <if test="sequence != null">
-        Sequence = #{sequence,jdbcType=INTEGER},
-      </if>
-      <if test="description != null">
-        Description = #{description,jdbcType=VARCHAR},
-      </if>
-      <if test="remarks != null">
-        Remarks = #{remarks,jdbcType=VARCHAR},
-      </if>
-      <if test="updateUserID != null">
-        UpdateUserID = #{updateUserID,jdbcType=INTEGER},
-      </if>
-      Version = Version + 1
-    </set>
-    where PictureID = #{pictureID,jdbcType=INTEGER}
-  </update>
-    
+	<resultMap id="BaseResultMap" type="com.iidooo.cms.model.po.CmsPicture">
+		<id column="PictureID" jdbcType="INTEGER" property="pictureID" />
+		<result column="ContentID" jdbcType="INTEGER" property="contentID" />
+		<result column="PictureName" jdbcType="VARCHAR" property="pictureName" />
+		<result column="PictureURL" jdbcType="VARCHAR" property="pictureURL" />
+		<result column="Href" jdbcType="VARCHAR" property="href" />
+		<result column="Sequence" jdbcType="INTEGER" property="sequence" />
+		<result column="Description" jdbcType="VARCHAR" property="description" />
+		<result column="Remarks" jdbcType="VARCHAR" property="remarks" />
+		<result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="CreateUserID" jdbcType="INTEGER" property="createUserID" />
+		<result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
+		<result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID" />
+		<result column="IsDelete" jdbcType="INTEGER" property="isDelete" />
+		<result column="Version" jdbcType="INTEGER" property="version" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		P.PictureID, P.ContentID, P.PictureName, P.PictureURL, P.Href, P.Sequence, P.Description,
+		P.Remarks, P.CreateTime, P.CreateUserID, P.UpdateTime, P.UpdateUserID, P.IsDelete, P.Version
+	</sql>
+
+	<!-- 根据ContentID获取图片列表 -->
+	<select id="selectByContentID" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from cms_picture P
+		where P.IsDelete = 0 and P.ContentID = #{contentID,jdbcType=INTEGER}
+	</select>
+
+	<!-- 通过图片ID获取图片对象 -->
+	<select id="selectByPictureID" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from cms_picture P
+		where P.IsDelete = 0 and P.PictureID = #{pictureID,jdbcType=INTEGER}
+	</select>
+
+	<!-- 插入图片数据 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="pictureID" parameterType="com.iidooo.cms.model.po.CmsPicture">
+		insert into cms_picture
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="contentID != null">
+				ContentID,
+			</if>
+			<if test="pictureName != null">
+				PictureName,
+			</if>
+			<if test="pictureURL != null">
+				PictureURL,
+			</if>
+			<if test="href != null">
+				Href,
+			</if>
+			Sequence,
+			<if test="description != null">
+				Description,
+			</if>
+			<if test="remarks != null">
+				Remarks,
+			</if>
+			<if test="createTime != null">
+				CreateTime,
+			</if>
+			<if test="createUserID != null">
+				CreateUserID,
+			</if>
+			<if test="updateUserID != null">
+				UpdateUserID,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="contentID != null">
+				#{contentID,jdbcType=INTEGER},
+			</if>
+			<if test="pictureName != null">
+				#{pictureName,jdbcType=VARCHAR},
+			</if>
+			<if test="pictureURL != null">
+				#{pictureURL,jdbcType=VARCHAR},
+			</if>
+			<if test="href != null">
+				#{href,jdbcType=VARCHAR},
+			</if>
+			(select ifnull(Max(Sequence),0) from cms_picture P where P.ContentID = #{contentID,jdbcType=INTEGER} and P.IsDelete = 0) + 1,
+			<if test="description != null">
+				#{description,jdbcType=VARCHAR},
+			</if>
+			<if test="remarks != null">
+				#{remarks,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createUserID != null">
+				#{createUserID,jdbcType=INTEGER},
+			</if>
+			<if test="updateUserID != null">
+				#{updateUserID,jdbcType=INTEGER},
+			</if>
+		</trim>
+	</insert>
+
+	<!-- 通过PictureID更新 -->
+	<update id="updateByPictureID" parameterType="com.iidooo.cms.model.po.CmsPicture">
+		update cms_picture
+		<set>
+			<if test="contentID != null">
+				ContentID = #{contentID,jdbcType=INTEGER},
+			</if>
+			<if test="pictureName != null">
+				PictureName = #{pictureName,jdbcType=VARCHAR},
+			</if>
+			<if test="pictureURL != null">
+				PictureURL = #{pictureURL,jdbcType=VARCHAR},
+			</if>
+			<if test="href != null">
+				Href = #{href,jdbcType=VARCHAR},
+			</if>
+			<if test="sequence != null">
+				Sequence = #{sequence,jdbcType=INTEGER},
+			</if>
+			<if test="description != null">
+				Description = #{description,jdbcType=VARCHAR},
+			</if>
+			<if test="remarks != null">
+				Remarks = #{remarks,jdbcType=VARCHAR},
+			</if>
+			<if test="updateUserID != null">
+				UpdateUserID = #{updateUserID,jdbcType=INTEGER},
+			</if>
+			Version = Version + 1
+		</set>
+		where PictureID = #{pictureID,jdbcType=INTEGER}
+	</update>
+
+	<!-- 根据PictureID把图片逻辑删掉 -->
+	<delete id="deleteByPictureID" parameterType="com.iidooo.cms.model.po.CmsPicture">
+		update cms_picture
+		<set>
+			<if test="updateUserID != null">
+				UpdateUserID = #{updateUserID,jdbcType=INTEGER},
+			</if>
+			Version = Version + 1,
+			IsDelete = 1
+		</set>		
+		where PictureID = #{pictureID,jdbcType=INTEGER}
+	</delete>
 </mapper>

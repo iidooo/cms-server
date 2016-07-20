@@ -1,9 +1,9 @@
 package com.iidooo.cms.model.po;
 
-public class CmsContentFile extends CmsContent{
+public class CmsContentFile {
     private Integer contentID;
 
-    private String fileURL;
+    private Integer downTimes;
 
     public Integer getContentID() {
         return contentID;
@@ -13,11 +13,11 @@ public class CmsContentFile extends CmsContent{
         this.contentID = contentID;
     }
 
-    public String getFileURL() {
-        return fileURL;
+    public Integer getDownTimes() {
+        return downTimes;
     }
 
-    public void setFileURL(String fileURL) {
-        this.fileURL = fileURL == null ? null : fileURL.trim();
+    public void setDownTimes(Integer downTimes) {
+        this.downTimes = downTimes;
     }
 }

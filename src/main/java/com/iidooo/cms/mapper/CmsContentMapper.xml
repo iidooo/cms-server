@@ -8,6 +8,7 @@
 		<result column="ContentType" jdbcType="VARCHAR" property="contentType" />
 		<result column="ContentTitle" jdbcType="VARCHAR" property="contentTitle" />
 		<result column="ContentSubTitle" jdbcType="VARCHAR" property="contentSubTitle" />
+		<result column="ContentImageTitle" jdbcType="VARCHAR" property="contentImageTitle" />
 		<result column="MetaTitle" jdbcType="VARCHAR" property="metaTitle" />
 		<result column="MetaKeywords" jdbcType="VARCHAR" property="metaKeywords" />
 		<result column="MetaDescription" jdbcType="VARCHAR" property="metaDescription" />
@@ -48,7 +49,7 @@
 	</resultMap>
 
 	<sql id="Base_Column_List">
-		C.ContentID, C.SiteID, C.ChannelID, C.ContentType, C.ContentTitle, C.ContentSubTitle,
+		C.ContentID, C.SiteID, C.ChannelID, C.ContentType, C.ContentTitle, C.ContentSubTitle, C.ContentImageTitle,
 		C.MetaTitle, C.MetaKeywords,
 		C.MetaDescription, C.ContentSummary, C.IsSilent, C.StickyIndex, C.PageViewCount,
 		C.UniqueVisitorCount, C.StarCount, C.CommentCount, C.StartShowDate,
@@ -135,7 +136,7 @@
 		where P.IsDelete = 0 and P.ContentID = #{contentID,jdbcType=INTEGER}
 		order by P.Sequence asc
 	</select>
-
+  
 	<select id="selectByContentID" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">
 		select
 		<include refid="Base_Column_List" />
@@ -309,6 +310,9 @@
 			<if test="contentSubTitle != null">
 				ContentSubTitle,
 			</if>
+			<if test="contentImageTitle != null">
+				ContentImageTitle,
+			</if>
 			<if test="metaTitle != null">
 				MetaTitle,
 			</if>
@@ -386,6 +390,9 @@
 			</if>
 			<if test="contentSubTitle != null">
 				#{contentSubTitle,jdbcType=VARCHAR},
+			</if>
+			<if test="contentImageTitle != null">
+				#{contentImageTitle,jdbcType=VARCHAR},
 			</if>
 			<if test="metaTitle != null">
 				#{metaTitle,jdbcType=VARCHAR},
@@ -469,6 +476,9 @@
 			</if>
 			<if test="contentSubTitle != null">
 				ContentSubTitle = #{contentSubTitle,jdbcType=VARCHAR},
+			</if>
+			<if test="contentImageTitle != null">
+				ContentImageTitle = #{contentImageTitle,jdbcType=VARCHAR},
 			</if>
 			<if test="metaTitle != null">
 				MetaTitle = #{metaTitle,jdbcType=VARCHAR},
