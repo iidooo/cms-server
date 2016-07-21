@@ -148,5 +148,17 @@
     </set>
     where FileID = #{fileID,jdbcType=INTEGER}
   </update>
-
+	
+	<!-- 根据ContentID把所有的关联文件删掉 -->
+	<update id="deleteByContentID" parameterType="com.iidooo.cms.model.po.CmsContent">
+		update cms_file
+		<set>
+			<if test="updateUserID != null">
+				UpdateUserID = #{updateUserID,jdbcType=INTEGER},
+			</if>
+			Version = Version + 1,
+			IsDelete = 1
+		</set>		
+		where ContentID = #{contentID,jdbcType=INTEGER}
+	</update>
 </mapper>

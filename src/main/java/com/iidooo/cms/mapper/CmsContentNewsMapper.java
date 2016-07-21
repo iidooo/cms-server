@@ -9,7 +9,6 @@ import com.iidooo.cms.model.po.CmsContentNews;
 import com.iidooo.core.model.Page;
 
 public interface CmsContentNewsMapper {
-    int deleteByPrimaryKey(Integer contentID);
 
     /**
      * 插入新的新闻内容对象

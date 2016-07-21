@@ -137,7 +137,7 @@
 	</update>
 
 	<!-- 根据PictureID把图片逻辑删掉 -->
-	<delete id="deleteByPictureID" parameterType="com.iidooo.cms.model.po.CmsPicture">
+	<update id="deleteByPictureID" parameterType="com.iidooo.cms.model.po.CmsPicture">
 		update cms_picture
 		<set>
 			<if test="updateUserID != null">
@@ -147,5 +147,18 @@
 			IsDelete = 1
 		</set>		
 		where PictureID = #{pictureID,jdbcType=INTEGER}
-	</delete>
+	</update>
+	
+	<!-- 根据ContentID把所有的关联图片删掉 -->
+	<update id="deleteByContentID" parameterType="com.iidooo.cms.model.po.CmsContent">
+		update cms_picture
+		<set>
+			<if test="updateUserID != null">
+				UpdateUserID = #{updateUserID,jdbcType=INTEGER},
+			</if>
+			Version = Version + 1,
+			IsDelete = 1
+		</set>		
+		where ContentID = #{contentID,jdbcType=INTEGER}
+	</update>
 </mapper>

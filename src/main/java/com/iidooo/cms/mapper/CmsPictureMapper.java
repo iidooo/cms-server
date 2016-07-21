@@ -2,6 +2,7 @@ package com.iidooo.cms.mapper;
 
 import java.util.List;
 
+import com.iidooo.cms.model.po.CmsContent;
 import com.iidooo.cms.model.po.CmsPicture;
 
 public interface CmsPictureMapper {
@@ -40,4 +41,11 @@ public interface CmsPictureMapper {
      * @return 所影响的行数
      */
     int deleteByPictureID(CmsPicture picture);
+    
+    /**
+     * 根据ContentID把所有的关联图片删掉
+     * @param content 要删除图片的Content对象
+     * @return 所影响的行数
+     */
+    int deleteByContentID(CmsContent content);
 }

@@ -264,7 +264,7 @@
 		from cms_content C
 		join cms_channel L 
 		join cms_site S on
-		C.IsDelete = 0 and C.Status = '0' and L.IsDelete = 0 and 
+		C.IsDelete = 0 and C.Status = '1' and L.IsDelete = 0 and 
 		C.ChannelID = L.ChannelID and 
 		S.IsDelete = 0 and S.SiteID = L.SiteID
 		and S.SiteCode = #{channel.site.siteCode,jdbcType=VARCHAR}
@@ -278,7 +278,7 @@
 		from cms_content C
 		join cms_channel L 
 		join cms_site S on
-		C.IsDelete = 0 and C.Status = '0' and L.IsDelete = 0 and 
+		C.IsDelete = 0 and C.Status = '1' and L.IsDelete = 0 and 
 		C.ChannelID = L.ChannelID and 
 		S.IsDelete = 0 and S.SiteID = L.SiteID
 		and S.SiteCode = #{content.channel.site.siteCode,jdbcType=VARCHAR}
@@ -543,9 +543,6 @@
 	<update id="deleteByContentID" parameterType="com.iidooo.cms.model.po.CmsContent">
 		update cms_content
 		<set>			
-			<if test="updateTime != null">
-				UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
-			</if>
 			<if test="updateUserID != null">
 				UpdateUserID = #{updateUserID,jdbcType=INTEGER},
 			</if>

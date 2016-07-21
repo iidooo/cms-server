@@ -15,10 +15,12 @@ import com.iidooo.cms.mapper.CmsCommentMapper;
 import com.iidooo.cms.mapper.CmsContentMapper;
 import com.iidooo.cms.mapper.CmsContentNewsMapper;
 import com.iidooo.cms.mapper.CmsFavoriteMapper;
+import com.iidooo.cms.mapper.CmsFileMapper;
 import com.iidooo.cms.mapper.CmsPictureMapper;
 import com.iidooo.cms.model.po.CmsContent;
 import com.iidooo.cms.model.po.CmsContentNews;
 import com.iidooo.cms.model.po.CmsFavorite;
+import com.iidooo.cms.model.po.CmsFile;
 import com.iidooo.cms.model.po.CmsPicture;
 import com.iidooo.cms.model.vo.SearchCondition;
 import com.iidooo.cms.service.ContentService;
@@ -42,7 +44,10 @@ public class ContentServiceImpl implements ContentService {
     private CmsContentNewsMapper cmsContentNewsDao;
 
     @Autowired
-    private CmsPictureMapper cmsPictureDao;
+    private CmsPictureMapper cmsPictureMapper;
+
+    @Autowired
+    private CmsFileMapper cmsFileMapper;
 
     @Autowired
     private CmsCommentMapper cmsCommentMapper;
@@ -264,7 +269,7 @@ public class ContentServiceImpl implements ContentService {
                     }
                 }
             }
-            
+
             result = getContent(content.getContentID());
         } catch (Exception e) {
             logger.fatal(e);
@@ -311,7 +316,6 @@ public class ContentServiceImpl implements ContentService {
         } catch (Exception e) {
             logger.fatal(e);
         }
-
     }
 
     @Override
@@ -354,15 +358,20 @@ public class ContentServiceImpl implements ContentService {
     }
 
     @Override
+    @Transactional
     public boolean deleteContent(CmsContent content) {
         try {
-            content.setUpdateTime(new Date());
-            cmsContentDao.deleteByContentID(content);
+            if (cmsContentDao.deleteByContentID(content) <= 0) {
+                throw new Exception();
+            } else {
+                cmsPictureMapper.deleteByContentID(content);
+                cmsFileMapper.deleteByContentID(content);
+            }
             return true;
         } catch (Exception e) {
             e.printStackTrace();
             logger.fatal(e);
-            throw e;
+            return false;
         }
     }
 

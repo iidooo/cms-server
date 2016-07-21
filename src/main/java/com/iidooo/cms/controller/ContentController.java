@@ -1,5 +1,6 @@
 package com.iidooo.cms.controller;
 
+import java.lang.Thread.State;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -8,9 +9,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +23,6 @@ import com.iidooo.cms.enums.ContentType;
 import com.iidooo.cms.enums.TableName;
 import com.iidooo.cms.model.po.CmsContent;
 import com.iidooo.cms.model.po.CmsContentNews;
-import com.iidooo.cms.model.po.CmsFile;
-import com.iidooo.cms.model.po.CmsPicture;
 import com.iidooo.cms.model.vo.SearchCondition;
 import com.iidooo.cms.service.ContentService;
 import com.iidooo.cms.service.FavoriteService;
@@ -40,7 +36,6 @@ import com.iidooo.core.model.ResponseResult;
 import com.iidooo.core.service.DictItemService;
 import com.iidooo.core.service.HisOperatorService;
 import com.iidooo.core.service.SecurityUserService;
-import com.iidooo.core.util.FileUtil;
 import com.iidooo.core.util.PageUtil;
 import com.iidooo.core.util.StringUtil;
 import com.iidooo.core.util.ValidateUtil;
@@ -147,24 +142,13 @@ public class ContentController {
     public ResponseResult deleteContent(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
         try {
-            String contentIDStr = request.getParameter("contentID");
-            String userIDStr = request.getParameter("userID");
+            String contentID = request.getParameter("contentID");
+            String userID = request.getParameter("userID");
 
-            if (StringUtil.isBlank(contentIDStr)) {
-                Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "contentID");
-                result.getMessages().add(message);
-            } else if (!ValidateUtil.isMatch(contentIDStr, RegularConstant.REGEX_NUMBER)) {
-                Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "contentID");
-                result.getMessages().add(message);
-            }
-
-            if (StringUtil.isBlank(userIDStr)) {
-                Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "userID");
-                result.getMessages().add(message);
-            } else if (!ValidateUtil.isMatch(userIDStr, RegularConstant.REGEX_NUMBER)) {
-                Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "userID");
-                result.getMessages().add(message);
-            }
+            result.checkFieldRequired("contentID", contentID);
+            result.checkFieldInteger("contentID", contentID);
+            result.checkFieldRequired("userID", userID);
+            result.checkFieldInteger("userID", userID);
 
             if (result.getMessages().size() > 0) {
                 // 验证失败，返回message
@@ -173,18 +157,16 @@ public class ContentController {
             }
 
             CmsContent content = new CmsContent();
-            content.setContentID(Integer.parseInt(contentIDStr));
-            content.setUpdateUserID(Integer.parseInt(userIDStr));
-            contentService.deleteContent(content);
-
-            // 返回找到的内容对象
-            result.setStatus(ResponseStatus.OK.getCode());
-            result.setData("success");
-            // 更新浏览记录
-            hisOperatorService.createHisOperator(TableName.CMS_CONTENT.toString(), content.getContentID(), request);
-
+            content.setContentID(Integer.parseInt(contentID));
+            content.setUpdateUserID(Integer.parseInt(userID));
+            if(!contentService.deleteContent(content)){
+                result.setStatus(ResponseStatus.Failed.getCode());
+            } else{
+                // 返回找到的内容对象
+                result.setStatus(ResponseStatus.OK.getCode());
+                result.setData("success");
+            }
         } catch (Exception e) {
-
             logger.fatal(e);
             result.checkException(e);
         }
@@ -434,6 +416,9 @@ public class ContentController {
             // 获取可选参数
             String contentTitle = request.getParameter("contentTitle");
             String contentSubTitle = request.getParameter("contentSubTitle");
+            String status = request.getParameter("status");
+            String isSilent = request.getParameter("isSilent");
+            String stickyIndex = request.getParameter("stickyIndex");
             String contentImageTitle = request.getParameter("contentImageTitle");
             String contentSummary = request.getParameter("contentSummary");
             String contentBody = request.getParameter("contentBody");
@@ -464,6 +449,17 @@ public class ContentController {
             content.setContentImageTitle(contentImageTitle);
             content.setContentSummary(contentSummary);
             content.setContentBody(contentBody);
+            
+            if(StringUtil.isNotBlank(status) && ValidateUtil.isMatch(status, RegularConstant.REGEX_NUMBER)){
+                content.setStatus(status);
+            }
+            if (StringUtil.isNotBlank(stickyIndex) &&  ValidateUtil.isMatch(stickyIndex, RegularConstant.REGEX_NUMBER)) {
+                content.setStickyIndex(Integer.parseInt(stickyIndex));
+            }
+            if (StringUtil.isNotBlank(isSilent) && ValidateUtil.isMatch(isSilent, RegularConstant.REGEX_NUMBER)) {
+                content.setIsSilent(Integer.parseInt(isSilent));
+            }
+            
             content.setCreateTime(new Date());
             content.setCreateUserID(Integer.parseInt(userID));
             content.setUpdateUserID(Integer.parseInt(userID));
@@ -520,6 +516,10 @@ public class ContentController {
             String contentSummary = request.getParameter("contentSummary");
             String contentBody = request.getParameter("contentBody");
 
+            String status = request.getParameter("status");
+            String isSilent = request.getParameter("isSilent");
+            String stickyIndex = request.getParameter("stickyIndex");
+            
             // 工厂创建对象
             CmsContent content = null;
             if (contentType.equals(ContentType.Default.getCode())) {
@@ -547,8 +547,17 @@ public class ContentController {
             content.setContentImageTitle(contentImageTitle);
             content.setContentSummary(contentSummary);
             content.setContentBody(contentBody);
-            content.setCreateTime(new Date());
-            content.setCreateUserID(Integer.parseInt(userID));
+            
+            if(StringUtil.isNotBlank(status) && ValidateUtil.isMatch(status, RegularConstant.REGEX_NUMBER)){
+                content.setStatus(status);
+            }
+            if (StringUtil.isNotBlank(stickyIndex) &&  ValidateUtil.isMatch(stickyIndex, RegularConstant.REGEX_NUMBER)) {
+                content.setStickyIndex(Integer.parseInt(stickyIndex));
+            }
+            if (StringUtil.isNotBlank(isSilent) && ValidateUtil.isMatch(isSilent, RegularConstant.REGEX_NUMBER)) {
+                content.setIsSilent(Integer.parseInt(isSilent));
+            }
+            
             content.setUpdateUserID(Integer.parseInt(userID));
 
             content = contentService.updateContent(content);
