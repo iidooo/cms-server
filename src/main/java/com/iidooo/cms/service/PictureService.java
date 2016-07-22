@@ -7,7 +7,7 @@ import com.iidooo.cms.model.po.CmsPicture;
 public interface PictureService {
     CmsPicture getPicture(Integer pictureID);
     
-    List<CmsPicture> getPictures(Integer contentID);
+    List<CmsPicture> getPictureList(Integer contentID);
     
     CmsPicture createPicture(CmsPicture picture);
     

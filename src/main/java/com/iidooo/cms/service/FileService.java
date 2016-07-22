@@ -7,7 +7,7 @@ import com.iidooo.cms.model.po.CmsFile;
 public interface FileService {
     CmsFile getFile(Integer fileID);
 
-    List<CmsFile> getFiles(Integer contentID);
+    List<CmsFile> getFileList(Integer contentID);
 
     CmsFile createFile(CmsFile file);
 

@@ -30,7 +30,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public List<CmsFile> getFiles(Integer contentID) {
+    public List<CmsFile> getFileList(Integer contentID) {
         List<CmsFile> result = new ArrayList<CmsFile>();
         try {
             result = fileMapper.selectByContentID(contentID);

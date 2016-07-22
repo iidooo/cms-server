@@ -76,7 +76,7 @@ public interface ContentService {
      * @param page 分页条件
      * @return 内容列表
      */
-    List<CmsContent> getContents(SearchCondition condition, Page page);
+    List<CmsContent> getContentList(SearchCondition condition, Page page);
 
     /**
      * 创建内容对象

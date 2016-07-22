@@ -20,8 +20,6 @@ import com.iidooo.cms.mapper.CmsPictureMapper;
 import com.iidooo.cms.model.po.CmsContent;
 import com.iidooo.cms.model.po.CmsContentNews;
 import com.iidooo.cms.model.po.CmsFavorite;
-import com.iidooo.cms.model.po.CmsFile;
-import com.iidooo.cms.model.po.CmsPicture;
 import com.iidooo.cms.model.vo.SearchCondition;
 import com.iidooo.cms.service.ContentService;
 import com.iidooo.core.mapper.DictItemMapper;
@@ -194,7 +192,7 @@ public class ContentServiceImpl implements ContentService {
     }
 
     @Override
-    public List<CmsContent> getContents(SearchCondition condition, Page page) {
+    public List<CmsContent> getContentList(SearchCondition condition, Page page) {
         try {
             List<CmsContent> result = cmsContentDao.selectForSearch(condition, page);
 

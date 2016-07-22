@@ -34,6 +34,7 @@
 		<association select="selectCreateUser" column="createUserID" property="createUser" javaType="com.iidooo.core.model.po.SecurityUser"></association>
 		<association select="selectChannel" column="channelID" property="channel" javaType="com.iidooo.cms.model.po.CmsChannel"></association>		
 		<collection select="selectPictureList" column="contentID" property="pictureList" ofType="com.iidooo.cms.model.po.CmsPicture"></collection>
+		<collection select="selectFileList" column="contentID" property="fileList" ofType="com.iidooo.cms.model.po.CmsFile"></collection>
 	</resultMap>
 	
 	<resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.iidooo.cms.model.po.CmsContent">
@@ -135,6 +136,35 @@
 		from cms_picture P
 		where P.IsDelete = 0 and P.ContentID = #{contentID,jdbcType=INTEGER}
 		order by P.Sequence asc
+	</select>
+	
+	<!-- 根据CmsContent表中的ContentID查询CmsFile信息 -->
+	<resultMap id="FileListResultMap" type="com.iidooo.cms.model.po.CmsFile" >
+    <id column="FileID" property="fileID" jdbcType="INTEGER" />
+    <result column="ContentID" property="contentID" jdbcType="INTEGER" />
+    <result column="FileName" property="fileName" jdbcType="VARCHAR" />
+    <result column="FileURL" property="fileURL" jdbcType="VARCHAR" />
+    <result column="FileSize" property="fileSize" jdbcType="BIGINT" />
+    <result column="FileType" property="fileType" jdbcType="VARCHAR" />
+    <result column="Sequence" property="sequence" jdbcType="INTEGER" />
+    <result column="Remarks" property="remarks" jdbcType="VARCHAR" />
+    <result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="UpdateUserID" property="updateUserID" jdbcType="INTEGER" />
+    <result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="CreateUserID" property="createUserID" jdbcType="INTEGER" />
+    <result column="IsDelete" property="isDelete" jdbcType="INTEGER" />
+    <result column="Version" property="version" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="File_Column_List" >
+    F.FileID, F.ContentID, F.FileName, F.FileURL, F.FileSize, F.FileType, F.Sequence, F.Remarks, F.UpdateTime, 
+    F.UpdateUserID, F.CreateTime, F.CreateUserID, F.IsDelete, F.Version
+  </sql>
+	<select id="selectFileList" parameterType="java.lang.Integer" resultMap="FileListResultMap">
+		select
+		<include refid="File_Column_List" />
+		from cms_file F
+		where F.IsDelete = 0 and F.ContentID = #{contentID,jdbcType=INTEGER}
+		order by F.Sequence asc
 	</select>
   
 	<select id="selectByContentID" parameterType="java.lang.Integer" resultMap="ResultMapWithBLOBs">

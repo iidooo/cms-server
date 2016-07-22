@@ -31,7 +31,7 @@ public class PictureServiceImpl implements PictureService {
     }
 
     @Override
-    public List<CmsPicture> getPictures(Integer contentID) {
+    public List<CmsPicture> getPictureList(Integer contentID) {
         List<CmsPicture> result = new ArrayList<CmsPicture>();
         try {
             result = pictureMapper.selectByContentID(contentID);

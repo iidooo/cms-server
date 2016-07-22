@@ -54,8 +54,8 @@ public class PictureController {
     }
     
     @ResponseBody
-    @RequestMapping(value = { "/admin/getPictures" }, method = RequestMethod.POST)
-    public ResponseResult getPictures(HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(value = { "/admin/getPictureList" }, method = RequestMethod.POST)
+    public ResponseResult getPictureList(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
         try {
             String contentID = request.getParameter("contentID");
@@ -66,7 +66,7 @@ public class PictureController {
                 return result;
             }
 
-            List<CmsPicture> pictures = pictureService.getPictures(Integer.parseInt(contentID));
+            List<CmsPicture> pictures = pictureService.getPictureList(Integer.parseInt(contentID));
 
             // 返回找到的内容对象
             result.setStatus(ResponseStatus.OK.getCode());

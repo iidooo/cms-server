@@ -1,6 +1,5 @@
 package com.iidooo.cms.controller;
 
-import java.lang.Thread.State;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -64,8 +63,8 @@ public class ContentController {
     private SecurityUserService sercurityUserService;
 
     @ResponseBody
-    @RequestMapping(value = "/admin/searchContents", method = RequestMethod.POST)
-    public ResponseResult searchContents(HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(value = "/admin/searchContentList", method = RequestMethod.POST)
+    public ResponseResult searchContentList(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
         try {
             String siteID = request.getParameter("siteID");
@@ -123,9 +122,9 @@ public class ContentController {
             page = PageUtil.executePage(recordSum, page);
 
             Map<String, Object> data = new HashMap<String, Object>();
-            List<CmsContent> contents = contentService.getContents(condition, page);
+            List<CmsContent> contentList = contentService.getContentList(condition, page);
             data.put("page", page);
-            data.put("contents", contents);
+            data.put("contentList", contentList);
             // 返回找到的内容对象
             result.setStatus(ResponseStatus.OK.getCode());
             result.setData(data);

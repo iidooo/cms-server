@@ -58,8 +58,8 @@ public class FileController {
     }
     
     @ResponseBody
-    @RequestMapping(value = {"/admin/getFiles"}, method = RequestMethod.POST)
-    public ResponseResult getFiles(HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(value = {"/admin/getFileList"}, method = RequestMethod.POST)
+    public ResponseResult getFileList(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
         try {            
             String contentID = request.getParameter("contentID");
@@ -70,7 +70,7 @@ public class FileController {
                 return result;
             }
             
-            List<CmsFile> files = fileService.getFiles(Integer.parseInt(contentID));   
+            List<CmsFile> files = fileService.getFileList(Integer.parseInt(contentID));   
 
             // 返回找到的内容对象
             result.setStatus(ResponseStatus.OK.getCode());

@@ -52,7 +52,7 @@
 	</listener>
 
 	<!-- 配置微信的监听器 -->
-	<listener>
+<!-- 	<listener>
 		<listener-class>com.iidooo.weixin.listener.WeiXinListener</listener-class>
 	</listener>
 	<context-param>
@@ -62,5 +62,5 @@
 	<context-param>
 		<param-name>AppSecret</param-name>
 		<param-value>9f6ef54b107121facb3bac200a2d4513</param-value>
-	</context-param>
+	</context-param> -->
 </web-app>
