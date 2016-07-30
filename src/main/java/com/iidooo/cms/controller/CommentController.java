@@ -223,7 +223,7 @@ public class CommentController {
             int parentID = Integer.parseInt(parentIDStr);
 
             // 判断用户是否可以创建评论IsSlient＝1
-            SecurityUser userInfo = sercurityUserService.getSecurityUserByID(userID);
+            SecurityUser userInfo = sercurityUserService.getSecurityUser(userID);
             if (userInfo == null || userInfo.getIsSilent() != 0 || userInfo.getIsDisable() != 0) {
                 // 验证失败，返回message
                 result.setStatus(ResponseStatus.ConfinedFailed.getCode());

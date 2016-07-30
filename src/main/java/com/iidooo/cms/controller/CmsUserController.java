@@ -82,7 +82,7 @@ public class CmsUserController {
                 return result;
             }
 
-            SecurityUser securityUser = this.securityUserService.getSecurityUserByID(Integer.valueOf(userID));
+            SecurityUser securityUser = this.securityUserService.getSecurityUser(Integer.valueOf(userID));
             if (securityUser == null) {
                 result.setStatus(ResponseStatus.QueryEmpty.getCode());
             } else {

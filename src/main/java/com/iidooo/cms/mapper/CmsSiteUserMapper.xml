@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.iidooo.cms.mapper.CmsSiteOwnerMapper" >
-  <resultMap id="BaseResultMap" type="com.iidooo.cms.model.po.CmsSiteOwner" >
+<mapper namespace="com.iidooo.cms.mapper.CmsSiteUserMapper" >
+  <resultMap id="BaseResultMap" type="com.iidooo.cms.model.po.CmsSiteUser" >
     <id column="RelID" property="relID" jdbcType="INTEGER" />
     <result column="SiteID" property="siteID" jdbcType="INTEGER" />
     <result column="UserID" property="userID" jdbcType="INTEGER" />
@@ -21,15 +21,32 @@
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
-    from cms_site_owner
+    from cms_site_user
     where RelID = #{relID,jdbcType=INTEGER}
   </select>
+  
+  <!-- 检索站点的用户数量 -->
+  <select id="selectCountForSearch" resultType="java.lang.Integer" parameterType="com.iidooo.cms.model.vo.SearchCondition">
+	select count(U.RelID)
+	from cms_site_user U
+	where U.IsDelete = 0
+	<if test="siteID != null and siteID != 0">
+		and U.SiteID = #{siteID,jdbcType=INTEGER}
+	</if>
+	<if test="startDateTime != null and startDateTime != ''">
+		and U.CreateTime &gt;= #{startDateTime}
+	</if>
+	<if test="endDateTime != null and endDateTime != ''">
+		and U.CreateTime &lt;= #{endDateTime}
+	</if>
+  </select>
+  
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
-    delete from cms_site_owner
+    delete from cms_site_user
     where RelID = #{relID,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.iidooo.cms.model.po.CmsSiteOwner" >
-    insert into cms_site_owner (RelID, SiteID, UserID, 
+  <insert id="insert" parameterType="com.iidooo.cms.model.po.CmsSiteUser" >
+    insert into cms_site_user (RelID, SiteID, UserID, 
       Role, Remarks, UpdateTime, 
       UpdateUserID, CreateTime, CreateUserID, 
       IsDelete, Version)
@@ -38,8 +55,8 @@
       #{updateUserID,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{createUserID,jdbcType=INTEGER}, 
       #{isDelete,jdbcType=INTEGER}, #{version,jdbcType=INTEGER})
   </insert>
-  <insert id="insertSelective" parameterType="com.iidooo.cms.model.po.CmsSiteOwner" >
-    insert into cms_site_owner
+  <insert id="insertSelective" parameterType="com.iidooo.cms.model.po.CmsSiteUser" >
+    insert into cms_site_user
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="relID != null" >
         RelID,
@@ -111,8 +128,8 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.iidooo.cms.model.po.CmsSiteOwner" >
-    update cms_site_owner
+  <update id="updateByPrimaryKeySelective" parameterType="com.iidooo.cms.model.po.CmsSiteUser" >
+    update cms_site_user
     <set >
       <if test="siteID != null" >
         SiteID = #{siteID,jdbcType=INTEGER},
@@ -147,8 +164,8 @@
     </set>
     where RelID = #{relID,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.iidooo.cms.model.po.CmsSiteOwner" >
-    update cms_site_owner
+  <update id="updateByPrimaryKey" parameterType="com.iidooo.cms.model.po.CmsSiteUser" >
+    update cms_site_user
     set SiteID = #{siteID,jdbcType=INTEGER},
       UserID = #{userID,jdbcType=INTEGER},
       Role = #{role,jdbcType=VARCHAR},

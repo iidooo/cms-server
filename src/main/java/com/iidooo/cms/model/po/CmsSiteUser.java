@@ -2,7 +2,7 @@ package com.iidooo.cms.model.po;
 
 import java.util.Date;
 
-public class CmsSiteOwner {
+public class CmsSiteUser {
     private Integer relID;
 
     private Integer siteID;

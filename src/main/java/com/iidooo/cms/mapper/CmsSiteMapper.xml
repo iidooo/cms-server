@@ -14,6 +14,7 @@
     <result column="IsDelete" property="isDelete" jdbcType="INTEGER" />
     <result column="Version" property="version" jdbcType="INTEGER" />
     <association select="selectCreateUser" column="createUserID" property="createUser" javaType="com.iidooo.core.model.po.SecurityUser"></association>
+    <collection select="selectOwnerList" column="siteID" property="ownerList" ofType="com.iidooo.cms.model.po.CmsSiteUser"></collection>
   </resultMap>
   <sql id="Base_Column_List" >
     S.SiteID, S.SiteCode, S.SiteName, S.SiteURL, S.Remarks, S.UpdateTime, S.UpdateUserID, S.CreateTime, 
@@ -57,8 +58,33 @@
 		<include refid="SecurityUser_Column_List" />
 		from security_user U where UserID = #{createUserID,jdbcType=INTEGER}
 	</select>
+	
+	<!-- selectOwnerList -->
+	<resultMap id="OwnerResultMap" type="com.iidooo.cms.model.po.CmsSiteUser" >
+    <id column="RelID" property="relID" jdbcType="INTEGER" />
+    <result column="SiteID" property="siteID" jdbcType="INTEGER" />
+    <result column="UserID" property="userID" jdbcType="INTEGER" />
+    <result column="Role" property="role" jdbcType="VARCHAR" />
+    <result column="Remarks" property="remarks" jdbcType="VARCHAR" />
+    <result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="UpdateUserID" property="updateUserID" jdbcType="INTEGER" />
+    <result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="CreateUserID" property="createUserID" jdbcType="INTEGER" />
+    <result column="IsDelete" property="isDelete" jdbcType="INTEGER" />
+    <result column="Version" property="version" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Owner_Column_List" >
+    U.RelID, U.SiteID, U.UserID, U.Role, U.Remarks, U.UpdateTime, U.UpdateUserID, U.CreateTime, U.CreateUserID, 
+    U.IsDelete, U.Version
+  </sql>  
+  <select id="selectOwnerList" resultMap="OwnerResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Owner_Column_List" />
+    from cms_site_user U
+    where U.SiteID = #{siteID,jdbcType=INTEGER}
+  </select>
 	 
-	 <!-- 通过站点ID获取站点对象 -->
+  <!-- 通过站点ID获取站点对象 -->
   <select id="selectBySiteID" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
@@ -71,9 +97,9 @@
   	select 
     <include refid="Base_Column_List" />
     from cms_site S 
-    join cms_site_owner O
-    on S.IsDelete = 0 and O.IsDelete = 0 and S.SiteID = O.SiteID
-    where O.UserID = #{userID,jdbcType=INTEGER}
+    join cms_site_user U
+    on S.IsDelete = 0 and U.IsDelete = 0 and S.SiteID = U.SiteID
+    where U.UserID = #{userID,jdbcType=INTEGER}
   </select>
   
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >

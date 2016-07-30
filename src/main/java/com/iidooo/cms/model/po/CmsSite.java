@@ -1,6 +1,8 @@
 package com.iidooo.cms.model.po;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import com.iidooo.core.model.po.SecurityUser;
 
@@ -29,6 +31,12 @@ public class CmsSite {
 
     private Integer version;
 
+    private List<CmsSiteUser> ownerList;
+    
+    public CmsSite(){
+        this.ownerList = new ArrayList<CmsSiteUser>();
+    }
+    
     public Integer getSiteID() {
         return siteID;
     }
@@ -124,4 +132,13 @@ public class CmsSite {
     public void setVersion(Integer version) {
         this.version = version;
     }
+
+    public List<CmsSiteUser> getOwnerList() {
+        return ownerList;
+    }
+
+    public void setOwnerList(List<CmsSiteUser> ownerList) {
+        this.ownerList = ownerList;
+    } 
+    
 }

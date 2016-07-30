@@ -25,8 +25,8 @@ public class SiteController {
     private SiteService siteService;    
     
     @ResponseBody
-    @RequestMapping(value = {"/admin/getSiteList"}, method = RequestMethod.POST)
-    public ResponseResult getSiteList(HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(value = {"/admin/getRelatedSiteList"}, method = RequestMethod.POST)
+    public ResponseResult getRelatedSiteList(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
         try {
             

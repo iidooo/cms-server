@@ -61,6 +61,54 @@ public class ContentController {
 
     @Autowired
     private SecurityUserService sercurityUserService;
+    
+    @ResponseBody
+    @RequestMapping(value = "/admin/getContentCount", method = RequestMethod.POST)
+    public ResponseResult getContentCount(HttpServletRequest request, HttpServletResponse response) {
+        ResponseResult result = new ResponseResult();
+        try {
+            String siteID = request.getParameter("siteID");
+            result.checkFieldRequired("siteID", siteID);
+            result.checkFieldInteger("siteID", siteID);
+            if (result.getMessages().size() > 0) {
+                // 验证失败，返回message
+                result.setStatus(ResponseStatus.Failed.getCode());
+                return result;
+            }
+
+            String channelID = request.getParameter("channelID");
+            String contentTitle = request.getParameter("contentTitle");
+            String contentType = request.getParameter("contentType");
+            String startDateTime = request.getParameter("startDateTime");
+            String endDateTime = request.getParameter("endDateTime");
+            String contentStatus = request.getParameter("contentStatus");
+            String createUserID = request.getParameter("createUserID");
+
+            SearchCondition condition = new SearchCondition();
+            condition.setSiteID(Integer.parseInt(siteID));
+
+            if (StringUtil.isNotBlank(channelID) && ValidateUtil.isMatch(channelID, RegularConstant.REGEX_NUMBER)) {
+                condition.setChannelID(Integer.parseInt(channelID));
+            }
+            condition.setContentTitle(contentTitle);
+            condition.setContentType(contentType);
+            condition.setStartDateTime(startDateTime);
+            condition.setEndDateTime(endDateTime);
+            condition.setContentStatus(contentStatus);
+
+            if (StringUtil.isNotBlank(createUserID) && ValidateUtil.isMatch(createUserID, RegularConstant.REGEX_NUMBER)) {
+                condition.setCreateUserID(Integer.parseInt(createUserID));
+            }
+            int recordSum = contentService.getContentsCount(condition);
+            result.setStatus(ResponseStatus.OK.getCode());
+            result.setData(recordSum);
+
+        } catch (Exception e) {
+            logger.fatal(e);
+            result.checkException(e);
+        }
+        return result;
+    }
 
     @ResponseBody
     @RequestMapping(value = "/admin/searchContentList", method = RequestMethod.POST)
