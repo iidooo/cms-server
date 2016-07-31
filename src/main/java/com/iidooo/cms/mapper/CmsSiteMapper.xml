@@ -189,12 +189,11 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.iidooo.cms.model.po.CmsSite" >
+  
+  <!-- 通过站点ID来更新站点 -->
+  <update id="updateBySiteID" parameterType="com.iidooo.cms.model.po.CmsSite" >
     update cms_site
     <set >
-      <if test="siteCode != null" >
-        SiteCode = #{siteCode,jdbcType=VARCHAR},
-      </if>
       <if test="siteName != null" >
         SiteName = #{siteName,jdbcType=VARCHAR},
       </if>
@@ -204,39 +203,12 @@
       <if test="remarks != null" >
         Remarks = #{remarks,jdbcType=VARCHAR},
       </if>
-      <if test="updateTime != null" >
-        UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
-      </if>
       <if test="updateUserID != null" >
         UpdateUserID = #{updateUserID,jdbcType=INTEGER},
       </if>
-      <if test="createTime != null" >
-        CreateTime = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="createUserID != null" >
-        CreateUserID = #{createUserID,jdbcType=INTEGER},
-      </if>
-      <if test="isDelete != null" >
-        IsDelete = #{isDelete,jdbcType=INTEGER},
-      </if>
-      <if test="version != null" >
-        Version = #{version,jdbcType=INTEGER},
-      </if>
+        Version = Version + 1
     </set>
     where SiteID = #{siteID,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.iidooo.cms.model.po.CmsSite" >
-    update cms_site
-    set SiteCode = #{siteCode,jdbcType=VARCHAR},
-      SiteName = #{siteName,jdbcType=VARCHAR},
-      SiteURL = #{siteURL,jdbcType=VARCHAR},
-      Remarks = #{remarks,jdbcType=VARCHAR},
-      UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
-      UpdateUserID = #{updateUserID,jdbcType=INTEGER},
-      CreateTime = #{createTime,jdbcType=TIMESTAMP},
-      CreateUserID = #{createUserID,jdbcType=INTEGER},
-      IsDelete = #{isDelete,jdbcType=INTEGER},
-      Version = #{version,jdbcType=INTEGER}
-    where SiteID = #{siteID,jdbcType=INTEGER}
-  </update>
+
 </mapper>

@@ -38,5 +38,21 @@ public class SiteServiceImpl implements SiteService {
             logger.fatal(e);
         }
         return result;
+    }
+
+    @Override
+    public CmsSite updateSite(CmsSite site) {
+        CmsSite result = null;
+        try {
+            if (siteMapper.updateBySiteID(site) <= 0) {
+                return null;
+            }
+            result = siteMapper.selectBySiteID(site.getSiteID());
+        } catch (Exception e) {
+            logger.fatal(e);
+        }
+        return result;
     }   
+    
+    
 }

@@ -25,7 +25,10 @@ public interface CmsSiteMapper {
      */
     List<CmsSite> selectByOwner(Integer userID);
 
-    int updateByPrimaryKeySelective(CmsSite record);
-
-    int updateByPrimaryKey(CmsSite record);
+    /**
+     * 通过站点ID来更新站点
+     * @param site 站点信息对象
+     * @return 更新操作所影响的行
+     */
+    int updateBySiteID(CmsSite site);
 }

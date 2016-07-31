@@ -20,16 +20,84 @@ import com.iidooo.core.model.ResponseResult;
 @Controller
 public class SiteController {
     private static final Logger logger = Logger.getLogger(SiteController.class);
-    
+
     @Autowired
-    private SiteService siteService;    
+    private SiteService siteService;
+
+    @ResponseBody
+    @RequestMapping(value = { "/admin/getSite" }, method = RequestMethod.POST)
+    public ResponseResult getSite(HttpServletRequest request, HttpServletResponse response) {
+        ResponseResult result = new ResponseResult();
+        try {
+
+            String siteID = request.getParameter("siteID");
+            result.checkFieldRequired("siteID", siteID);
+            result.checkFieldInteger("siteID", siteID);
+            if (result.getMessages().size() > 0) {
+                result.setStatus(ResponseStatus.Failed.getCode());
+                return result;
+            }
+
+            CmsSite site = siteService.getSite(Integer.parseInt(siteID));
+            if (site == null) {
+                result.setStatus(ResponseStatus.Failed.getCode());
+            } else {
+                result.setStatus(ResponseStatus.OK.getCode());
+                result.setData(site);
+            }
+        } catch (Exception e) {
+            logger.fatal(e);
+            result.checkException(e);
+        }
+        return result;
+    }
     
     @ResponseBody
-    @RequestMapping(value = {"/admin/getRelatedSiteList"}, method = RequestMethod.POST)
+    @RequestMapping(value = { "/admin/updateSite" }, method = RequestMethod.POST)
+    public ResponseResult updateSite(HttpServletRequest request, HttpServletResponse response) {
+        ResponseResult result = new ResponseResult();
+        try {
+            String siteID = request.getParameter("siteID");
+            String userID = request.getParameter("userID");
+            result.checkFieldRequired("siteID", siteID);
+            result.checkFieldInteger("siteID", siteID);
+            result.checkFieldRequired("userID", userID);
+            result.checkFieldInteger("userID", userID);
+            if (result.getMessages().size() > 0) {
+                result.setStatus(ResponseStatus.Failed.getCode());
+                return result;
+            }
+
+            String siteName = request.getParameter("siteName");
+            String siteURL = request.getParameter("siteURL");
+            String remarks = request.getParameter("remarks");
+            
+            CmsSite site = new CmsSite();
+            site.setSiteID(Integer.parseInt(siteID));
+            site.setSiteName(siteName);
+            site.setSiteURL(siteURL);
+            site.setRemarks(remarks);
+            site.setUpdateUserID(Integer.parseInt(userID));
+            site = siteService.updateSite(site);
+            if (site == null) {
+                result.setStatus(ResponseStatus.Failed.getCode());
+            } else {
+                result.setStatus(ResponseStatus.OK.getCode());
+                result.setData(site);
+            }
+        } catch (Exception e) {
+            logger.fatal(e);
+            result.checkException(e);
+        }
+        return result;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = { "/admin/getRelatedSiteList" }, method = RequestMethod.POST)
     public ResponseResult getRelatedSiteList(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
         try {
-            
+
             String userID = request.getParameter("userID");
             result.checkFieldRequired("userID", userID);
             result.checkFieldInteger("userID", userID);
@@ -37,13 +105,13 @@ public class SiteController {
                 result.setStatus(ResponseStatus.Failed.getCode());
                 return result;
             }
-            
-            List<CmsSite> sites = siteService.getSiteList(Integer.parseInt(userID));   
+
+            List<CmsSite> sites = siteService.getSiteList(Integer.parseInt(userID));
 
             // 返回找到的内容对象
             result.setStatus(ResponseStatus.OK.getCode());
             result.setData(sites);
-            
+
         } catch (Exception e) {
             logger.fatal(e);
             result.checkException(e);
