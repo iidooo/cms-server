@@ -315,11 +315,6 @@
 		and L.ChannelPath =	#{content.channel.channelPath,jdbcType=VARCHAR}
 		order by C.StickyIndex desc, C.${page.sortField} ${page.sortType} limit ${page.start}, ${page.pageSize}
 	</select>
-
-	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-		delete from cms_content
-		where ContentID = #{contentID,jdbcType=INTEGER}
-	</delete>
 	
 	<!-- 插入内容对象 -->
 	<insert id="insert" useGeneratedKeys="true" keyProperty="contentID" parameterType="com.iidooo.cms.model.po.CmsContent">

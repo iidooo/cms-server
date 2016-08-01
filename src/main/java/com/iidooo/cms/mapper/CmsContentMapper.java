@@ -9,8 +9,6 @@ import com.iidooo.cms.model.vo.SearchCondition;
 import com.iidooo.core.model.Page;
 
 public interface CmsContentMapper {
-    int deleteByPrimaryKey(Integer contentID);
-
     /**
      * 插入内容对象
      * @param content 内容对象

@@ -5,11 +5,27 @@ import java.util.List;
 import com.iidooo.cms.model.po.CmsChannel;
 
 public interface CmsChannelMapper {
-    int deleteByPrimaryKey(Integer channelID);
 
-    int insert(CmsChannel record);
-
-    int insertSelective(CmsChannel record);
+    /**
+     * 插入一个栏目对象
+     * @param channel 该栏目对象会被插入
+     * @return 插入成功所返回的影响行数
+     */
+    int insert(CmsChannel channel);
+    
+    /**
+     * 通过ChannelPath获取CmsChannel对象
+     * @param channel 参数
+     * @return 所获得的栏目对象
+     */
+    CmsChannel selectByChannelPath(CmsChannel channel);
+    
+    /**
+     * 通过ChannelID获取CmsChannel对象
+     * @param channelID 栏目ID
+     * @return 所获的的CmsChannel对象
+     */
+    CmsChannel selectByChannelID(Integer channelID);
     
     /**
      * 查询栏目一览
@@ -25,7 +41,17 @@ public interface CmsChannelMapper {
      */
     List<CmsChannel> selectBySiteID(Integer siteID);
 
-    int updateByPrimaryKeySelective(CmsChannel record);
-
-    int updateByPrimaryKey(CmsChannel record);
+    /**
+     * 通过栏目ID更新栏目
+     * @param channel 要更新的栏目对象
+     * @return 更新所影响的行数
+     */
+    int updateByChannelID(CmsChannel channel);
+    
+    /**
+     * 通过栏目ID删除栏目
+     * @param channel 要删除的栏目对象
+     * @return 所影响的行数
+     */
+    int deleteByChannelID(CmsChannel channel);
 }

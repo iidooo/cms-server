@@ -18,6 +18,56 @@ public class ChannelServiceImpl implements ChannelService {
 
     @Autowired
     private CmsChannelMapper cmsChannelMapper;
+       
+    @Override
+    public CmsChannel createChannel(CmsChannel channel) {
+        CmsChannel result = null;
+        try {
+            if(cmsChannelMapper.insert(channel) <= 0){
+                return result;
+            }
+            result = cmsChannelMapper.selectByChannelID(channel.getChannelID());
+        } catch (Exception e) {
+            logger.fatal(e);
+        }
+        return result;
+    }
+
+    @Override
+    public CmsChannel updateChannel(CmsChannel channel) {
+        CmsChannel result = null;
+        try {
+            if(cmsChannelMapper.updateByChannelID(channel) <= 0){
+                return result;
+            }
+            result = cmsChannelMapper.selectByChannelID(channel.getChannelID());
+        } catch (Exception e) {
+            logger.fatal(e);
+        }
+        return result;
+    }
+
+    @Override
+    public CmsChannel getChannel(Integer channelID) {
+        CmsChannel result = null;
+        try {
+            result = cmsChannelMapper.selectByChannelID(channelID);
+        } catch (Exception e) {
+            logger.fatal(e);
+        }
+        return result;
+    }
+
+    @Override
+    public CmsChannel getChannelByPath(CmsChannel channel) {
+        CmsChannel result = null;
+        try {
+            result = cmsChannelMapper.selectByChannelPath(channel);
+        } catch (Exception e) {
+            logger.fatal(e);
+        }
+        return result;
+    }
 
     @Override
     public List<CmsChannel> getChannelList(String siteCode) {
@@ -39,6 +89,19 @@ public class ChannelServiceImpl implements ChannelService {
             logger.fatal(e);
         }
         return result;
+    }
+
+    @Override
+    public boolean deleteChannel(CmsChannel channel) { 
+        try {
+            if(cmsChannelMapper.deleteByChannelID(channel) <= 0){
+                return false;
+            }
+            return true;
+        } catch (Exception e) {
+            logger.fatal(e);
+            return false;
+        }
     }
 
 }
