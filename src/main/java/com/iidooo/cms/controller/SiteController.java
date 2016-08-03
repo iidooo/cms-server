@@ -58,11 +58,11 @@ public class SiteController {
         ResponseResult result = new ResponseResult();
         try {
             String siteID = request.getParameter("siteID");
-            String userID = request.getParameter("userID");
+            String operatorID = request.getParameter("operatorID");
             result.checkFieldRequired("siteID", siteID);
             result.checkFieldInteger("siteID", siteID);
-            result.checkFieldRequired("userID", userID);
-            result.checkFieldInteger("userID", userID);
+            result.checkFieldRequired("operatorID", operatorID);
+            result.checkFieldInteger("operatorID", operatorID);
             if (result.getMessages().size() > 0) {
                 result.setStatus(ResponseStatus.Failed.getCode());
                 return result;
@@ -77,7 +77,7 @@ public class SiteController {
             site.setSiteName(siteName);
             site.setSiteURL(siteURL);
             site.setRemarks(remarks);
-            site.setUpdateUserID(Integer.parseInt(userID));
+            site.setUpdateUserID(Integer.parseInt(operatorID));
             site = siteService.updateSite(site);
             if (site == null) {
                 result.setStatus(ResponseStatus.Failed.getCode());
@@ -98,15 +98,15 @@ public class SiteController {
         ResponseResult result = new ResponseResult();
         try {
 
-            String userID = request.getParameter("userID");
-            result.checkFieldRequired("userID", userID);
-            result.checkFieldInteger("userID", userID);
+            String operatorID = request.getParameter("operatorID");
+            result.checkFieldRequired("userID", operatorID);
+            result.checkFieldInteger("userID", operatorID);
             if (result.getMessages().size() > 0) {
                 result.setStatus(ResponseStatus.Failed.getCode());
                 return result;
             }
 
-            List<CmsSite> sites = siteService.getSiteList(Integer.parseInt(userID));
+            List<CmsSite> sites = siteService.getSiteList(Integer.parseInt(operatorID));
 
             // 返回找到的内容对象
             result.setStatus(ResponseStatus.OK.getCode());

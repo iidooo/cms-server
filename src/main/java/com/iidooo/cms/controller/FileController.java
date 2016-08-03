@@ -88,12 +88,12 @@ public class FileController {
     public ResponseResult createFile(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
         try {
-            String userID = request.getParameter("userID");
+            String operatorID = request.getParameter("operatorID");
             String contentID = request.getParameter("contentID");
             String fileURL = request.getParameter("fileURL");
             
-            result.checkFieldRequired("userID", userID);
-            result.checkFieldInteger("userID", userID);
+            result.checkFieldRequired("operatorID", operatorID);
+            result.checkFieldInteger("operatorID", operatorID);
             result.checkFieldRequired("contentID", contentID);
             result.checkFieldInteger("contentID", contentID);
             result.checkFieldRequired("fileURL", fileURL);
@@ -114,8 +114,8 @@ public class FileController {
             }
             file.setFileType(FileUtil.getFileSuffix(fileURL));
             file.setCreateTime(new Date());
-            file.setCreateUserID(Integer.parseInt(userID));
-            file.setUpdateUserID(Integer.parseInt(userID));
+            file.setCreateUserID(Integer.parseInt(operatorID));
+            file.setUpdateUserID(Integer.parseInt(operatorID));
             file = fileService.createFile(file);
             if (file == null) {
                 result.setStatus(ResponseStatus.Failed.getCode());
@@ -136,12 +136,12 @@ public class FileController {
     public ResponseResult updateFile(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
         try {
-            String userID = request.getParameter("userID");
+            String operatorID = request.getParameter("operatorID");
             String fileID = request.getParameter("fileID");
             String fileURL = request.getParameter("fileURL");
             
-            result.checkFieldRequired("userID", userID);
-            result.checkFieldInteger("userID", userID);
+            result.checkFieldRequired("operatorID", operatorID);
+            result.checkFieldInteger("operatorID", operatorID);
             result.checkFieldRequired("fileID", fileID);
             result.checkFieldInteger("fileID", fileID);
             result.checkFieldRequired("fileURL", fileURL);
@@ -161,7 +161,7 @@ public class FileController {
                 file.setFileSize(Long.parseLong(fileSize));
             }
             file.setFileType(FileUtil.getFileSuffix(fileURL));
-            file.setUpdateUserID(Integer.parseInt(userID));
+            file.setUpdateUserID(Integer.parseInt(operatorID));
             file = fileService.updateFile(file);
             if (file == null) {
                 result.setStatus(ResponseStatus.Failed.getCode());
@@ -182,11 +182,11 @@ public class FileController {
     public ResponseResult deleteFile(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
         try {
-            String userID = request.getParameter("userID");
+            String operatorID = request.getParameter("operatorID");
             String fileID = request.getParameter("fileID");
             
-            result.checkFieldRequired("userID", userID);
-            result.checkFieldInteger("userID", userID);
+            result.checkFieldRequired("operatorID", operatorID);
+            result.checkFieldInteger("operatorID", operatorID);
             result.checkFieldRequired("fileID", fileID);
             result.checkFieldInteger("fileID", fileID);
             if (result.getMessages().size() > 0) {
@@ -196,7 +196,7 @@ public class FileController {
             
             CmsFile file = new CmsFile();
             file.setFileID(Integer.parseInt(fileID));
-            file.setUpdateUserID(Integer.parseInt(userID));
+            file.setUpdateUserID(Integer.parseInt(operatorID));
             if (!fileService.deleteFile(file)) {
                 result.setStatus(ResponseStatus.Failed.getCode());
             } else {

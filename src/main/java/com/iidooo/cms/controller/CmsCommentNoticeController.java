@@ -38,15 +38,15 @@ public class CmsCommentNoticeController {
     public @ResponseBody ResponseResult deleteCommentNotice(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
         try {
-            String userID = request.getParameter("userID");
+            String operatorID = request.getParameter("operatorID");
             String commentID = request.getParameter("commentID");
-            if (StringUtil.isBlank(userID)) {
+            if (StringUtil.isBlank(operatorID)) {
                 // 验证失败，返回message
                 Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "userID");
                 result.getMessages().add(message);
                 result.setStatus(ResponseStatus.Failed.getCode());
                 return result;
-            } else if (!ValidateUtil.isMatch(userID, RegularConstant.REGEX_NUMBER)) {
+            } else if (!ValidateUtil.isMatch(operatorID, RegularConstant.REGEX_NUMBER)) {
                 Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "userID");
                 result.getMessages().add(message);
                 result.setStatus(ResponseStatus.Failed.getCode());
@@ -65,9 +65,9 @@ public class CmsCommentNoticeController {
                 return result;
             }
 
-            CmsCommentNotice cmsCommentNotice = cmsCommentNoticeService.getCommentNotice(Integer.valueOf(userID), Integer.valueOf(commentID));
+            CmsCommentNotice cmsCommentNotice = cmsCommentNoticeService.getCommentNotice(Integer.valueOf(operatorID), Integer.valueOf(commentID));
             if (cmsCommentNotice != null) {
-                if (this.cmsCommentNoticeService.deleteCommentNotice(Integer.valueOf(userID), Integer.valueOf(commentID)) == false) {
+                if (this.cmsCommentNoticeService.deleteCommentNotice(Integer.valueOf(operatorID), Integer.valueOf(commentID)) == false) {
                     result.setStatus(ResponseStatus.QueryEmpty.getCode());
                 } else {
                     result.setStatus(ResponseStatus.OK.getCode());
@@ -94,26 +94,26 @@ public class CmsCommentNoticeController {
     public @ResponseBody ResponseResult deleteCommentNoticeList(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
         try {
-            String userID = request.getParameter("userID");
-            if (StringUtil.isBlank(userID)) {
+            String operatorID = request.getParameter("operatorID");
+            if (StringUtil.isBlank(operatorID)) {
                 // 验证失败，返回message
-                Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "userID");
+                Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "operatorID");
                 result.getMessages().add(message);
                 result.setStatus(ResponseStatus.Failed.getCode());
                 return result;
-            } else if (!ValidateUtil.isMatch(userID, RegularConstant.REGEX_NUMBER)) {
-                Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "userID");
+            } else if (!ValidateUtil.isMatch(operatorID, RegularConstant.REGEX_NUMBER)) {
+                Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "operatorID");
                 result.getMessages().add(message);
                 result.setStatus(ResponseStatus.Failed.getCode());
                 return result;
             }
-            if (this.cmsCommentNoticeService.deleteCommentNoticeList(Integer.valueOf(userID)) == false) {
+            if (this.cmsCommentNoticeService.deleteCommentNoticeList(Integer.valueOf(operatorID)) == false) {
                 result.setStatus(ResponseStatus.QueryEmpty.getCode());
             } else {
                 result.setStatus(ResponseStatus.OK.getCode());
             }
             // 更新浏览记录
-            hisOperatorService.createHisOperator(TableName.CMS_COMMENT_NOTICE.toString(), Integer.valueOf(userID), request);
+            hisOperatorService.createHisOperator(TableName.CMS_COMMENT_NOTICE.toString(), Integer.valueOf(operatorID), request);
 
         } catch (Exception e) {
             logger.fatal(e);

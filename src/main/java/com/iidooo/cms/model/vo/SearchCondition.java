@@ -1,5 +1,8 @@
 package com.iidooo.cms.model.vo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SearchCondition {
     private Integer siteID;
     
@@ -16,6 +19,24 @@ public class SearchCondition {
     private String endDateTime;
     
     private Integer createUserID;
+    
+    private String loginID;
+    
+    private String userName;
+    
+    private String sex;
+    
+    private String mobile;
+    
+    private String email;
+    
+    private String weixinID;
+    
+    private List<String> roles;
+    
+    public SearchCondition(){
+        this.roles = new ArrayList<String>();
+    }
 
     public Integer getSiteID() {
         return siteID;
@@ -79,6 +100,62 @@ public class SearchCondition {
 
     public void setCreateUserID(Integer createUserID) {
         this.createUserID = createUserID;
+    }
+
+    public String getLoginID() {
+        return loginID;
+    }
+
+    public void setLoginID(String loginID) {
+        this.loginID = loginID;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getWeixinID() {
+        return weixinID;
+    }
+
+    public void setWeixinID(String weixinID) {
+        this.weixinID = weixinID;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
     }
     
 

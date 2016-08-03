@@ -62,12 +62,12 @@ public class ChannelController {
     public ResponseResult createChannel(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
         try {
-            String userID = request.getParameter("userID");
+            String operatorID = request.getParameter("operatorID");
             String siteID = request.getParameter("siteID");
             String channelName = request.getParameter("channelName");
             String channelPath = request.getParameter("channelPath");
-            result.checkFieldRequired("userID", userID);
-            result.checkFieldInteger("userID", userID);
+            result.checkFieldRequired("operatorID", operatorID);
+            result.checkFieldInteger("operatorID", operatorID);
             result.checkFieldRequired("siteID", siteID);
             result.checkFieldInteger("siteID", siteID);
             result.checkFieldRequired("channelName", channelName);
@@ -96,8 +96,8 @@ public class ChannelController {
             channel.setMetaDescription(metaDescription);
             channel.setRemarks(remarks);
             channel.setCreateTime(new Date());
-            channel.setCreateUserID(Integer.parseInt(userID));
-            channel.setUpdateUserID(Integer.parseInt(userID));
+            channel.setCreateUserID(Integer.parseInt(operatorID));
+            channel.setUpdateUserID(Integer.parseInt(operatorID));
             
             // 检查channel path 是否重复
             if(channelService.getChannelByPath(channel) != null){
@@ -125,13 +125,13 @@ public class ChannelController {
     public ResponseResult updateChannel(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
         try {
-            String userID = request.getParameter("userID");
+            String operatorID = request.getParameter("operatorID");
             String siteID = request.getParameter("siteID");
             String channelID = request.getParameter("channelID");
             String channelName = request.getParameter("channelName");
             String channelPath = request.getParameter("channelPath");
-            result.checkFieldRequired("userID", userID);
-            result.checkFieldInteger("userID", userID);
+            result.checkFieldRequired("operatorID", operatorID);
+            result.checkFieldInteger("operatorID", operatorID);
             result.checkFieldRequired("siteID", siteID);
             result.checkFieldInteger("siteID", siteID);
             result.checkFieldRequired("channelID", channelID);
@@ -162,7 +162,7 @@ public class ChannelController {
             channel.setMetaKeywords(metaKeywords);
             channel.setMetaDescription(metaDescription);
             channel.setRemarks(remarks);
-            channel.setUpdateUserID(Integer.parseInt(userID));
+            channel.setUpdateUserID(Integer.parseInt(operatorID));
             
             // 检查channel path是否重复
             CmsChannel existChannel = channelService.getChannelByPath(channel);
@@ -247,10 +247,10 @@ public class ChannelController {
     public ResponseResult deleteChannel(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
         try {
-            String userID = request.getParameter("userID");
+            String operatorID = request.getParameter("operatorID");
             String channelID = request.getParameter("channelID");
-            result.checkFieldRequired("userID", userID);
-            result.checkFieldInteger("userID", userID);
+            result.checkFieldRequired("operatorID", operatorID);
+            result.checkFieldInteger("operatorID", operatorID);
             result.checkFieldRequired("channelID", channelID);
             result.checkFieldInteger("channelID", channelID);
 
@@ -261,7 +261,7 @@ public class ChannelController {
 
             CmsChannel channel = new CmsChannel();
             channel.setChannelID(Integer.parseInt(channelID));
-            channel.setUpdateUserID(Integer.parseInt(userID));
+            channel.setUpdateUserID(Integer.parseInt(operatorID));
             if(channelService.deleteChannel(channel)){
                 result.setStatus(ResponseStatus.OK.getCode());
             } else {

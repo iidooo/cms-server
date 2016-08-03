@@ -190,12 +190,12 @@ public class ContentController {
         ResponseResult result = new ResponseResult();
         try {
             String contentID = request.getParameter("contentID");
-            String userID = request.getParameter("userID");
+            String operatorID = request.getParameter("operatorID");
 
             result.checkFieldRequired("contentID", contentID);
             result.checkFieldInteger("contentID", contentID);
-            result.checkFieldRequired("userID", userID);
-            result.checkFieldInteger("userID", userID);
+            result.checkFieldRequired("operatorID", operatorID);
+            result.checkFieldInteger("operatorID", operatorID);
 
             if (result.getMessages().size() > 0) {
                 // 验证失败，返回message
@@ -205,7 +205,7 @@ public class ContentController {
 
             CmsContent content = new CmsContent();
             content.setContentID(Integer.parseInt(contentID));
-            content.setUpdateUserID(Integer.parseInt(userID));
+            content.setUpdateUserID(Integer.parseInt(operatorID));
             if(!contentService.deleteContent(content)){
                 result.setStatus(ResponseStatus.Failed.getCode());
             } else{
@@ -327,14 +327,14 @@ public class ContentController {
                 return result;
             }
 
-            String userIDStr = request.getParameter("userID");
-            Integer userID = null;
+            String userIDStr = request.getParameter("operatorID");
+            Integer operatorID = null;
             if (StringUtil.isNotBlank(userIDStr) && ValidateUtil.isMatch(userIDStr, RegularConstant.REGEX_NUMBER)) {
-                userID = Integer.valueOf(userIDStr);
+                operatorID = Integer.valueOf(userIDStr);
             }
 
             // 查询获得内容对象
-            CmsContent content = contentService.getContent(Integer.valueOf(contentID), userID);
+            CmsContent content = contentService.getContent(Integer.valueOf(contentID), operatorID);
             if (content == null) {
                 result.setStatus(ResponseStatus.QueryEmpty.getCode());
                 return result;
@@ -442,15 +442,15 @@ public class ContentController {
             // 必填参数
             String siteID = request.getParameter("siteID");
             String channelID = request.getParameter("channelID");
-            String userID = request.getParameter("userID");
+            String operatorID = request.getParameter("operatorID");
             String contentType = request.getParameter("contentType");
 
             result.checkFieldRequired("siteID", siteID);
             result.checkFieldInteger("siteID", siteID);
             result.checkFieldRequired("channelID", channelID);
             result.checkFieldInteger("channelID", channelID);
-            result.checkFieldRequired("userID", userID);
-            result.checkFieldInteger("userID", userID);
+            result.checkFieldRequired("operatorID", operatorID);
+            result.checkFieldInteger("operatorID", operatorID);
             result.checkFieldRequired("contentType", contentType);
             result.checkFieldInteger("contentType", contentType);
 
@@ -508,8 +508,8 @@ public class ContentController {
             }
             
             content.setCreateTime(new Date());
-            content.setCreateUserID(Integer.parseInt(userID));
-            content.setUpdateUserID(Integer.parseInt(userID));
+            content.setCreateUserID(Integer.parseInt(operatorID));
+            content.setUpdateUserID(Integer.parseInt(operatorID));
 
             content = contentService.createContent(content);
             if (content != null) {
@@ -536,7 +536,7 @@ public class ContentController {
             String siteID = request.getParameter("siteID");
             String contentID = request.getParameter("contentID");
             String channelID = request.getParameter("channelID");
-            String userID = request.getParameter("userID");
+            String operatorID = request.getParameter("operatorID");
             String contentType = request.getParameter("contentType");
 
             result.checkFieldRequired("siteID", siteID);
@@ -545,8 +545,8 @@ public class ContentController {
             result.checkFieldInteger("contentID", contentID);
             result.checkFieldRequired("channelID", channelID);
             result.checkFieldInteger("channelID", channelID);
-            result.checkFieldRequired("userID", userID);
-            result.checkFieldInteger("userID", userID);
+            result.checkFieldRequired("operatorID", operatorID);
+            result.checkFieldInteger("operatorID", operatorID);
             result.checkFieldRequired("contentType", contentType);
             result.checkFieldInteger("contentType", contentType);
 
@@ -605,7 +605,7 @@ public class ContentController {
                 content.setIsSilent(Integer.parseInt(isSilent));
             }
             
-            content.setUpdateUserID(Integer.parseInt(userID));
+            content.setUpdateUserID(Integer.parseInt(operatorID));
 
             content = contentService.updateContent(content);
 

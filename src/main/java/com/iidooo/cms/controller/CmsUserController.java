@@ -67,22 +67,22 @@ public class CmsUserController {
     public ResponseResult getUserInfo(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
         try {
-            String userID = request.getParameter("userID");
-            if (StringUtil.isBlank(userID)) {
+            String operatorID = request.getParameter("operatorID");
+            if (StringUtil.isBlank(operatorID)) {
                 // 验证失败，返回message
-                Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "userID");
+                Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "operatorID");
                 result.getMessages().add(message);
                 result.setStatus(ResponseStatus.Failed.getCode());
                 return result;
-            } else if (!ValidateUtil.isMatch(userID, RegularConstant.REGEX_NUMBER)) {
+            } else if (!ValidateUtil.isMatch(operatorID, RegularConstant.REGEX_NUMBER)) {
                 // 验证失败，返回message
-                Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "userID");
+                Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "operatorID");
                 result.getMessages().add(message);
                 result.setStatus(ResponseStatus.Failed.getCode());
                 return result;
             }
 
-            SecurityUser securityUser = this.securityUserService.getSecurityUser(Integer.valueOf(userID));
+            SecurityUser securityUser = this.securityUserService.getSecurityUser(Integer.valueOf(operatorID));
             if (securityUser == null) {
                 result.setStatus(ResponseStatus.QueryEmpty.getCode());
             } else {
@@ -209,7 +209,7 @@ public class CmsUserController {
         try {
             SecurityUser userInfo = new SecurityUser();
 
-            String userID = request.getParameter("userID");
+            String operatorID = request.getParameter("operatorID");
             String userName = request.getParameter("userName");
             String mobile = request.getParameter("mobile");
             String email = request.getParameter("email");
@@ -221,21 +221,21 @@ public class CmsUserController {
             String isSilent = request.getParameter("isSilent");
             String isDisable = request.getParameter("isDisable");
 
-            if (StringUtil.isBlank(userID)) {
+            if (StringUtil.isBlank(operatorID)) {
                 // 验证失败，返回message
-                Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "userID");
+                Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "operatorID");
                 result.getMessages().add(message);
                 result.setStatus(ResponseStatus.Failed.getCode());
                 return result;
-            } else if (!ValidateUtil.isMatch(userID, RegularConstant.REGEX_NUMBER)) {
+            } else if (!ValidateUtil.isMatch(operatorID, RegularConstant.REGEX_NUMBER)) {
                 // 验证失败，返回message
-                Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "userID");
+                Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "operatorID");
                 result.getMessages().add(message);
                 result.setStatus(ResponseStatus.Failed.getCode());
                 return result;
             }
 
-            userInfo.setUserID(Integer.parseInt(userID));
+            userInfo.setUserID(Integer.parseInt(operatorID));
             userInfo.setUserName(userName);
             userInfo.setMobile(mobile);
 
@@ -319,18 +319,18 @@ public class CmsUserController {
     public @ResponseBody ResponseResult updateUserExp(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
         try {
-            String userIDStr = request.getParameter("userID");
+            String userIDStr = request.getParameter("operatorID");
             String experienceStr = request.getParameter("experience");
             // 是否是受每日经验限定的Flag
             String isLimitedStr = request.getParameter("isLimited");
 
             if (StringUtil.isBlank(userIDStr)) {
                 // 验证失败，返回message
-                Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "userID");
+                Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "operatorID");
                 result.getMessages().add(message);
             } else if (!ValidateUtil.isMatch(userIDStr, RegularConstant.REGEX_NUMBER)) {
                 // 验证失败，返回message
-                Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "userID");
+                Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "operatorID");
                 result.getMessages().add(message);
             }
 
@@ -353,11 +353,11 @@ public class CmsUserController {
                 isLimitedStr = "1";
             }
 
-            int userID = Integer.parseInt(userIDStr);
+            int operatorID = Integer.parseInt(userIDStr);
             int experience = Integer.parseInt(experienceStr);
             int isLimited = Integer.parseInt(isLimitedStr);
 
-            SecurityUser userInfo = this.securityUserService.updateUserExp(userID, experience, isLimited);
+            SecurityUser userInfo = this.securityUserService.updateUserExp(operatorID, experience, isLimited);
             if (userInfo == null) {
                 Message message = new Message(MessageType.Information.getCode(), MessageLevel.INFO);
                 message.setDescription("The user's exp is more than limited of today!");

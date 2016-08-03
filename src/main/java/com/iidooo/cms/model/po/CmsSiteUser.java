@@ -2,12 +2,16 @@ package com.iidooo.cms.model.po;
 
 import java.util.Date;
 
+import com.iidooo.core.model.po.SecurityUser;
+
 public class CmsSiteUser {
     private Integer relID;
 
     private Integer siteID;
 
     private Integer userID;
+    
+    private SecurityUser user;
 
     private String role;
 
@@ -47,6 +51,14 @@ public class CmsSiteUser {
 
     public void setUserID(Integer userID) {
         this.userID = userID;
+    }
+
+    public SecurityUser getUser() {
+        return user;
+    }
+
+    public void setUser(SecurityUser user) {
+        this.user = user;
     }
 
     public String getRole() {

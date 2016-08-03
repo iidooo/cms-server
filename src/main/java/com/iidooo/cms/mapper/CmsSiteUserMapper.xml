@@ -13,11 +13,53 @@
     <result column="CreateUserID" property="createUserID" jdbcType="INTEGER" />
     <result column="IsDelete" property="isDelete" jdbcType="INTEGER" />
     <result column="Version" property="version" jdbcType="INTEGER" />
+    <association select="selectUser" column="userID" property="user" javaType="com.iidooo.core.model.po.SecurityUser"></association>
   </resultMap>
   <sql id="Base_Column_List" >
-    RelID, SiteID, UserID, Role, Remarks, UpdateTime, UpdateUserID, CreateTime, CreateUserID, 
-    IsDelete, Version
+    SU.RelID, SU.SiteID, SU.UserID, SU.Role, SU.Remarks, SU.UpdateTime, SU.UpdateUserID, SU.CreateTime, SU.CreateUserID, 
+    SU.IsDelete, SU.Version
   </sql>
+  
+  <!-- selectUser -->
+  <resultMap id="UserResultMap" type="com.iidooo.core.model.po.SecurityUser">
+		<id column="UserID" property="userID" jdbcType="INTEGER" />
+		<result column="LoginID" property="loginID" jdbcType="VARCHAR" />
+		<result column="Password" property="password" jdbcType="VARCHAR" />
+		<result column="UserName" property="userName" jdbcType="VARCHAR" />
+		<result column="Mobile" property="mobile" jdbcType="VARCHAR" />
+		<result column="Email" property="email" jdbcType="VARCHAR" />
+		<result column="Sex" property="sex" jdbcType="CHAR" />
+		<result column="Birthday" property="birthday" jdbcType="DATE" />
+		<result column="WeixinID" property="weixinID" jdbcType="VARCHAR" />
+		<result column="PhotoURL" property="photoURL" jdbcType="VARCHAR" />
+		<result column="IsSilent" property="isSilent" jdbcType="INTEGER" />
+		<result column="IsDisable" property="isDisable" jdbcType="INTEGER" />
+		<result column="UserType" property="userType" jdbcType="VARCHAR" />
+		<result column="Level" property="level" jdbcType="INTEGER" />
+		<result column="Points" property="points" jdbcType="INTEGER" />
+		<result column="Experience" property="experience" jdbcType="INTEGER" />
+		<result column="Remarks" property="remarks" jdbcType="VARCHAR" />
+		<result column="UpdateTime" property="updateTime" jdbcType="TIMESTAMP" />
+		<result column="UpdateUserID" property="updateUserID" jdbcType="INTEGER" />
+		<result column="CreateTime" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="CreateUserID" property="createUserID" jdbcType="INTEGER" />
+		<result column="IsDelete" property="isDelete" jdbcType="INTEGER" />
+		<result column="Version" property="version" jdbcType="INTEGER" />
+	</resultMap>
+	<sql id="User_Column_List">
+		U.UserID, U.LoginID, U.Password, U.UserName, U.Mobile, U.Email, U.Sex, U.Birthday, U.WeixinID, U.PhotoURL,
+		U.IsSilent, U.IsDisable,
+		U.UserType, U.Level, U.Points, U.Experience, U.Remarks, U.UpdateTime, U.UpdateUserID,
+		U.CreateTime, U.CreateUserID, U.IsDelete, U.Version
+	</sql>
+	<select id="selectUser" resultMap="UserResultMap" parameterType="java.lang.Integer">
+		select
+		<include refid="User_Column_List" />
+		from security_user U
+		where U.UserID = #{userID,jdbcType=INTEGER}
+	</select>
+  
+  
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
@@ -27,17 +69,88 @@
   
   <!-- 检索站点的用户数量 -->
   <select id="selectCountForSearch" resultType="java.lang.Integer" parameterType="com.iidooo.cms.model.vo.SearchCondition">
-	select count(U.RelID)
-	from cms_site_user U
-	where U.IsDelete = 0
+	select count(SU.RelID)
+	from cms_site_user SU
+	join security_user U
+	on SU.IsDelete = 0 and U.IsDelete = 0 and SU.UserID = U.UserID
 	<if test="siteID != null and siteID != 0">
-		and U.SiteID = #{siteID,jdbcType=INTEGER}
+		and SU.SiteID = #{siteID,jdbcType=INTEGER}
 	</if>
 	<if test="startDateTime != null and startDateTime != ''">
-		and U.CreateTime &gt;= #{startDateTime}
+		and SU.CreateTime &gt;= #{startDateTime}
 	</if>
 	<if test="endDateTime != null and endDateTime != ''">
-		and U.CreateTime &lt;= #{endDateTime}
+		and SU.CreateTime &lt;= #{endDateTime}
+	</if>
+	<if test="roles != null and roles.size > 0">
+		and SU.Role in 
+		<foreach collection="roles" item="item" index="index" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</if>
+	<if test="loginID != null and loginID != ''">
+		and U.LoginID like '%${loginID}%'
+	</if>
+	<if test="userName != null and userName != ''">
+		and U.UserName like '%${userName}%'
+	</if>
+	<if test="sex != null and sex != ''">
+		and U.Sex = #{sex}
+	</if>
+	<if test="mobile != null and mobile != ''">
+		and U.Mobile like '%${mobile}%'
+	</if>
+	<if test="email != null and email != ''">
+		and U.Email like '%${email}%'
+	</if>
+	<if test="weixinID != null and weixinID != ''">
+		and U.WeixinID like '%${weixinID}%'
+	</if>
+  </select>
+  
+  <!-- 检索站点的用户 -->
+  <select id="selectForSearch" resultMap="BaseResultMap">
+  	select 
+	<include refid="Base_Column_List" />
+	from cms_site_user SU
+	join security_user U
+	on SU.IsDelete = 0 and U.IsDelete = 0 and SU.UserID = U.UserID
+	<if test="condition.siteID != null and condition.siteID != 0">
+		and SU.SiteID = #{condition.siteID,jdbcType=INTEGER}
+	</if>
+	<if test="condition.startDateTime != null and condition.startDateTime != ''">
+		and SU.CreateTime &gt;= #{condition.startDateTime}
+	</if>
+	<if test="condition.endDateTime != null and condition.endDateTime != ''">
+		and SU.CreateTime &lt;= #{condition.endDateTime}
+	</if>
+	<if test="condition.roles != null and condition.roles.size > 0">
+		and SU.Role in 
+		<foreach collection="condition.roles" item="item" index="index" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</if>
+	<if test="condition.loginID != null and condition.loginID != ''">
+		and U.LoginID like '%${condition.loginID}%'
+	</if>
+	<if test="condition.userName != null and condition.userName != ''">
+		and U.UserName like '%${condition.userName}%'
+	</if>
+	<if test="condition.sex != null and condition.sex != ''">
+		and U.Sex = #{condition.sex}
+	</if>
+	<if test="condition.mobile != null and condition.mobile != ''">
+		and U.Mobile like '%${condition.mobile}%'
+	</if>
+	<if test="condition.email != null and condition.email != ''">
+		and U.Email like '%${condition.email}%'
+	</if>
+	<if test="condition.weixinID != null and condition.weixinID != ''">
+		and U.WeixinID like '%${condition.weixinID}%'
+	</if>
+	<if test="page != null">
+		order by ${page.sortField} ${page.sortType}
+		limit ${page.start}, ${page.pageSize}
 	</if>
   </select>
   

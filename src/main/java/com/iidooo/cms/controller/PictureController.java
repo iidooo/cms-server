@@ -84,12 +84,12 @@ public class PictureController {
     public ResponseResult createPicture(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
         try {
-            String userID = request.getParameter("userID");
+            String operatorID = request.getParameter("operatorID");
             String contentID = request.getParameter("contentID");
             String pictureURL = request.getParameter("pictureURL");
             
-            result.checkFieldRequired("userID", userID);
-            result.checkFieldInteger("userID", userID);
+            result.checkFieldRequired("operatorID", operatorID);
+            result.checkFieldInteger("operatorID", operatorID);
             result.checkFieldRequired("contentID", contentID);
             result.checkFieldInteger("contentID", contentID);
             result.checkFieldRequired("pictureURL", pictureURL);
@@ -109,8 +109,8 @@ public class PictureController {
             picture.setHref(href);
             picture.setDescription(description);
             picture.setCreateTime(new Date());
-            picture.setCreateUserID(Integer.parseInt(userID));
-            picture.setUpdateUserID(Integer.parseInt(userID));
+            picture.setCreateUserID(Integer.parseInt(operatorID));
+            picture.setUpdateUserID(Integer.parseInt(operatorID));
             picture = pictureService.createPicture(picture);
             if (picture == null) {
                 result.setStatus(ResponseStatus.Failed.getCode());
@@ -133,12 +133,12 @@ public class PictureController {
     public ResponseResult updatePicture(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
         try {
-            String userID = request.getParameter("userID");
+            String operatorID = request.getParameter("operatorID");
             String pictureID = request.getParameter("pictureID");
             String pictureURL = request.getParameter("pictureURL");
             
-            result.checkFieldRequired("userID", userID);
-            result.checkFieldInteger("userID", userID);
+            result.checkFieldRequired("operatorID", operatorID);
+            result.checkFieldInteger("operatorID", operatorID);
             result.checkFieldRequired("pictureID", pictureID);
             result.checkFieldInteger("pictureID", pictureID);
             result.checkFieldRequired("pictureURL", pictureURL);
@@ -157,7 +157,7 @@ public class PictureController {
             picture.setPictureName(pictureName);
             picture.setHref(href);
             picture.setDescription(description);
-            picture.setUpdateUserID(Integer.parseInt(userID));
+            picture.setUpdateUserID(Integer.parseInt(operatorID));
             picture = pictureService.updatePicture(picture);
             if (picture == null) {
                 result.setStatus(ResponseStatus.Failed.getCode());
@@ -178,11 +178,11 @@ public class PictureController {
     public ResponseResult deletePicture(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
         try {
-            String userID = request.getParameter("userID");
+            String operatorID = request.getParameter("operatorID");
             String pictureID = request.getParameter("pictureID");
             
-            result.checkFieldRequired("userID", userID);
-            result.checkFieldInteger("userID", userID);
+            result.checkFieldRequired("operatorID", operatorID);
+            result.checkFieldInteger("operatorID", operatorID);
             result.checkFieldRequired("pictureID", pictureID);
             result.checkFieldInteger("pictureID", pictureID);
             if (result.getMessages().size() > 0) {
@@ -192,7 +192,7 @@ public class PictureController {
             
             CmsPicture picture = new CmsPicture();
             picture.setPictureID(Integer.parseInt(pictureID));
-            picture.setUpdateUserID(Integer.parseInt(userID));
+            picture.setUpdateUserID(Integer.parseInt(operatorID));
             if (!pictureService.deletePicture(picture)) {
                 result.setStatus(ResponseStatus.Failed.getCode());
             } else {

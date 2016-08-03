@@ -47,7 +47,7 @@ public class FavoriteController {
             // 解析获得传入的参数
             // 必填参数
             String contentIDStr = request.getParameter("contentID");
-            String userIDStr = request.getParameter("userID");
+            String userIDStr = request.getParameter("operatorID");
             if (StringUtil.isBlank(contentIDStr)) {
                 Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "contentID");
                 result.getMessages().add(message);
@@ -56,10 +56,10 @@ public class FavoriteController {
                 result.getMessages().add(message);
             }
             if (StringUtil.isBlank(userIDStr)) {
-                Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "userID");
+                Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "operatorID");
                 result.getMessages().add(message);
             } else if (!ValidateUtil.isMatch(userIDStr, RegularConstant.REGEX_NUMBER)) {
-                Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "userID");
+                Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "operatorID");
                 result.getMessages().add(message);
             }
 
@@ -70,9 +70,9 @@ public class FavoriteController {
             }
 
             int contentID = Integer.parseInt(contentIDStr);
-            int userID = Integer.parseInt(userIDStr);
+            int operatorID = Integer.parseInt(userIDStr);
 
-            Integer favoriteID = favoriteService.addFavorite(userID, contentID);
+            Integer favoriteID = favoriteService.addFavorite(operatorID, contentID);
             if (favoriteID != null) {
                 result.setStatus(ResponseStatus.OK.getCode());
                 result.setData("success");
@@ -101,7 +101,7 @@ public class FavoriteController {
             // 解析获得传入的参数
             // 必填参数
             String contentIDStr = request.getParameter("contentID");
-            String userIDStr = request.getParameter("userID");
+            String userIDStr = request.getParameter("operatorID");
             if (StringUtil.isBlank(contentIDStr)) {
                 Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "contentID");
                 result.getMessages().add(message);
@@ -110,10 +110,10 @@ public class FavoriteController {
                 result.getMessages().add(message);
             }
             if (StringUtil.isBlank(userIDStr)) {
-                Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "userID");
+                Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "operatorID");
                 result.getMessages().add(message);
             } else if (!ValidateUtil.isMatch(userIDStr, RegularConstant.REGEX_NUMBER)) {
-                Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "userID");
+                Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "operatorID");
                 result.getMessages().add(message);
             }
 
@@ -124,7 +124,7 @@ public class FavoriteController {
             }
 
             int contentID = Integer.parseInt(contentIDStr);
-            int userID = Integer.parseInt(userIDStr);
+            int operatorID = Integer.parseInt(userIDStr);
 
             String sortField = request.getParameter("sortField");
             if (StringUtil.isBlank(sortField)) {
@@ -149,10 +149,10 @@ public class FavoriteController {
             page.setStart(Integer.valueOf(start));
             page.setPageSize(Integer.valueOf(pageSize));
             
-            Integer favoriteID = favoriteService.removeFavorite(userID, contentID);
+            Integer favoriteID = favoriteService.removeFavorite(operatorID, contentID);
             if (favoriteID != null) {
                 result.setStatus(ResponseStatus.OK.getCode());
-                List<CmsContentWrap> contentWrapList = favoriteService.getFavoriteContentList(userID, page);
+                List<CmsContentWrap> contentWrapList = favoriteService.getFavoriteContentList(operatorID, page);
                 result.setData(contentWrapList);
                 // 更新浏览记录
                 hisOperatorService.createHisOperator(TableName.cms_favorite.toString(), favoriteID, request);
@@ -178,12 +178,12 @@ public class FavoriteController {
         try {
             // 解析获得传入的参数
             // 必填参数
-            String userIDStr = request.getParameter("userID");
+            String userIDStr = request.getParameter("operatorID");
             if (StringUtil.isBlank(userIDStr)) {
-                Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "userID");
+                Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "operatorID");
                 result.getMessages().add(message);
             } else if (!ValidateUtil.isMatch(userIDStr, RegularConstant.REGEX_NUMBER)) {
-                Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "userID");
+                Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "operatorID");
                 result.getMessages().add(message);
             }
 
@@ -193,7 +193,7 @@ public class FavoriteController {
                 return result;
             }
 
-            int userID = Integer.parseInt(userIDStr);
+            int operatorID = Integer.parseInt(userIDStr);
 
             String sortField = request.getParameter("sortField");
             if (StringUtil.isBlank(sortField)) {
@@ -218,7 +218,7 @@ public class FavoriteController {
             page.setStart(Integer.valueOf(start));
             page.setPageSize(Integer.valueOf(pageSize));
 
-            List<CmsContentWrap> contentWrapList = favoriteService.getFavoriteContentList(userID, page);
+            List<CmsContentWrap> contentWrapList = favoriteService.getFavoriteContentList(operatorID, page);
             result.setStatus(ResponseStatus.OK.getCode());
             result.setData(contentWrapList);
 
