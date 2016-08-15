@@ -43,5 +43,30 @@ public class SiteUserServiceImpl implements SiteUserService {
         return result;
     }
 
+    @Override
+    public CmsSiteUser getSiteUser(Integer siteID, Integer userID) {
+        CmsSiteUser result = null;
+        try {
+            result = siteUserMapper.selectBySiteUserID(siteID, userID);
+        } catch (Exception e) {
+            logger.fatal(e);
+        }
+        return result;
+    }
+
+    @Override
+    public CmsSiteUser updateSiteUser(CmsSiteUser siteUser) {
+        CmsSiteUser result = null;
+        try {
+            if(siteUserMapper.updateBySiteUserID(siteUser) <= 0){
+                return null;
+            }
+            result = siteUserMapper.selectBySiteUserID(siteUser.getSiteID(), siteUser.getUserID());
+        } catch (Exception e) {
+            logger.fatal(e);
+        }
+        return result;
+    }
+
     
 }

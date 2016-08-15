@@ -3,6 +3,7 @@
 <mapper namespace="com.iidooo.cms.mapper.CmsCommentMapper">
 	<resultMap id="BaseResultMap" type="com.iidooo.cms.model.po.CmsComment">
 		<id column="CommentID" property="commentID" jdbcType="INTEGER" />
+		<result column="SiteID" property="siteID" jdbcType="INTEGER" />
 		<result column="ContentID" property="contentID" jdbcType="INTEGER" />
 		<result column="ParentID" property="parentID" jdbcType="INTEGER" />
 		<result column="Sequence" property="sequence" jdbcType="INTEGER" />
@@ -18,8 +19,12 @@
 	<resultMap id="ResultMapWithBLOBs" type="com.iidooo.cms.model.po.CmsComment" extends="BaseResultMap">
 		<result column="Comment" property="comment" jdbcType="LONGVARCHAR" />
 	</resultMap>
+	<resultMap id="ResultMapWithContent" type="com.iidooo.cms.model.po.CmsComment" extends="ResultMapWithBLOBs">
+		<association column="contentID" property="content" select="selectContent" javaType="com.iidooo.cms.model.po.CmsContent"></association>
+	</resultMap>
+	
 	<sql id="Base_Column_List">
-		C.CommentID, C.ContentID, C.ParentID, C.Sequence, C.Remarks, C.CreateTime, C.CreateUserID, C.UpdateTime,
+		C.CommentID, C.SiteID, C.ContentID, C.ParentID, C.Sequence, C.Remarks, C.CreateTime, C.CreateUserID, C.UpdateTime,
 		C.UpdateUserID, C.IsDelete,
 		C.Version
 	</sql>
@@ -34,13 +39,60 @@
     	U.CreateTime, U.CreateUserID, U.IsDelete, U.Version
 		from security_user U where UserID = #{createUserID,jdbcType=INTEGER}
 	</select>
+	
+	<!-- 查询评论关联的内容对象 -->
+	<resultMap id="ContentResultMap" type="com.iidooo.cms.model.po.CmsContent">
+		<id column="ContentID" jdbcType="INTEGER" property="contentID" />
+		<result column="SiteID" jdbcType="INTEGER" property="siteID" />
+		<result column="ChannelID" jdbcType="INTEGER" property="channelID" />
+		<result column="ContentType" jdbcType="VARCHAR" property="contentType" />
+		<result column="ContentTitle" jdbcType="VARCHAR" property="contentTitle" />
+		<result column="ContentSubTitle" jdbcType="VARCHAR" property="contentSubTitle" />
+		<result column="ContentImageTitle" jdbcType="VARCHAR" property="contentImageTitle" />
+		<result column="MetaTitle" jdbcType="VARCHAR" property="metaTitle" />
+		<result column="MetaKeywords" jdbcType="VARCHAR" property="metaKeywords" />
+		<result column="MetaDescription" jdbcType="VARCHAR" property="metaDescription" />
+		<result column="ContentSummary" jdbcType="VARCHAR" property="contentSummary" />
+		<result column="IsSilent" jdbcType="INTEGER" property="isSilent" />
+		<result column="StickyIndex" jdbcType="INTEGER" property="stickyIndex" />
+		<result column="PageViewCount" jdbcType="INTEGER" property="pageViewCount" />
+		<result column="UniqueVisitorCount" jdbcType="INTEGER" property="uniqueVisitorCount" />
+		<result column="StarCount" jdbcType="INTEGER" property="starCount" />
+		<result column="CommentCount" jdbcType="INTEGER" property="commentCount" />
+		<result column="StartShowDate" property="startShowDate" jdbcType="VARCHAR" />
+		<result column="StartShowTime" property="startShowTime" jdbcType="VARCHAR" />
+		<result column="EndShowDate" property="endShowDate" jdbcType="VARCHAR" />
+		<result column="EndShowTime" property="endShowTime" jdbcType="VARCHAR" />
+		<result column="Status" property="status" jdbcType="VARCHAR" />
+		<result column="Remarks" jdbcType="VARCHAR" property="remarks" />
+		<result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="CreateUserID" jdbcType="INTEGER" property="createUserID" />
+		<result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
+		<result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID" />
+		<result column="IsDelete" jdbcType="INTEGER" property="isDelete" />
+		<result column="Version" jdbcType="INTEGER" property="version" />	
+	</resultMap>
+	<sql id="Content_Column_List">
+		C.ContentID, C.SiteID, C.ChannelID, C.ContentType, C.ContentTitle, C.ContentSubTitle, C.ContentImageTitle,
+		C.MetaTitle, C.MetaKeywords,
+		C.MetaDescription, C.ContentSummary, C.IsSilent, C.StickyIndex, C.PageViewCount,
+		C.UniqueVisitorCount, C.StarCount, C.CommentCount, C.StartShowDate,
+		C.StartShowTime,
+		C.EndShowDate, C.EndShowTime, C.Status, C.Remarks, C.CreateTime, C.CreateUserID, C.UpdateTime, C.UpdateUserID,
+		C.IsDelete, C.Version
+	</sql>
+	<select id="selectContent" parameterType="java.lang.Integer" resultType="com.iidooo.cms.model.po.CmsContent">
+		select <include refid="Content_Column_List" />
+		from cms_content C where C.ContentID = #{contentID,jdbcType=INTEGER}
+	</select>
 
-	<select id="selectByCommentID" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+	<!-- 通过主键查询CmsComment数据 -->
+	<select id="selectByCommentID" resultMap="ResultMapWithContent" parameterType="java.lang.Integer">
 		select
 		<include refid="Base_Column_List" />
 		,
 		<include refid="Blob_Column_List" />
-		from CMS_COMMENT C
+		from cms_comment C
 		where C.CommentID = #{commentID,jdbcType=INTEGER} and C.IsDelete = 0
 	</select>
 	
@@ -50,7 +102,7 @@
 		<include refid="Base_Column_List" />
 		,
 		<include refid="Blob_Column_List" />
-		from CMS_COMMENT C
+		from cms_comment C
 		where C.IsDelete = 0 and 
 		C.CreateUserID = #{createUserID,jdbcType=INTEGER} and 
 		C.ContentID = #{contentID,jdbcType=INTEGER} and
@@ -61,7 +113,7 @@
 	<select id="selectCommentCount" resultType="java.lang.Integer">
 		select
 		count(C.CommentID)
-		from CMS_COMMENT C
+		from cms_comment C
 		where C.IsDelete = 0 and C.ContentID =
 		#{commentID,jdbcType=INTEGER}
 	</select>
@@ -71,7 +123,7 @@
 		<include refid="Base_Column_List" />
 		,
 		<include refid="Blob_Column_List" />
-		from CMS_COMMENT C
+		from cms_comment C
 		where C.IsDelete = 0 and C.ContentID = #{contentID,jdbcType=VARCHAR}
 		<if test="page != null">
 			order by ${page.sortField} ${page.sortType} limit
@@ -84,21 +136,59 @@
 		<include refid="Base_Column_List" />
 		,
 		<include refid="Blob_Column_List" />
-		from CMS_COMMENT C join CMS_COMMENT_NOTICE N
+		from cms_comment C join CMS_COMMENT_NOTICE N
 		on C.CommentID = N.CommentID and UserID = #{userID,jdbcType=INTEGER} and C.IsDelete = 0
 		<if test="page != null">
 			order by ${page.sortField} ${page.sortType} limit
 			${page.start}, ${page.pageSize}
 		</if>
 	</select>
+	
+	<!-- 根据条件查询评论一览数目 -->
+	<select id="selectCountForSearch" resultType="java.lang.Integer" parameterType="com.iidooo.cms.model.vo.SearchCondition">
+		select count(C.CommentID)
+		from cms_comment C 
+		join cms_content CC on C.IsDelete = 0 and CC.IsDelete = 0 and C.ContentID = CC.ContentID
+		join security_user U on U.IsDelete = 0 and C.CreateUserID = U.UserID
+		and C.SiteID = #{siteID,jdbcType=INTEGER} 
+		<if test="comment != null">
+			and C.Comment like '%${comment}%'
+		</if>
+		<if test="contentTitle != null">
+			and CC.ContentTitle like '%${contentTitle}%'
+		</if>
+		<if test="createUserName != null">
+			and U.Username like '%${createUserName}%'
+		</if>
+	</select>
 
-	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-		delete from CMS_COMMENT
-		where CommentID = #{commentID,jdbcType=INTEGER}
-	</delete>
+	<!-- 检索评论一览 -->
+	<select id="selectForSearch" resultMap="ResultMapWithContent">
+		select
+		<include refid="Base_Column_List" />
+		,
+		<include refid="Blob_Column_List" />
+		from cms_comment C 
+		join cms_content CC on C.IsDelete = 0 and CC.IsDelete = 0 and C.ContentID = CC.ContentID
+		join security_user U on U.IsDelete = 0 and C.CreateUserID = U.UserID
+		and C.SiteID = #{condition.siteID,jdbcType=INTEGER} 
+		<if test="condition.comment != null">
+			and C.Comment like '%${condition.comment}%'
+		</if>
+		<if test="condition.contentTitle != null">
+			and CC.ContentTitle like '%${condition.contentTitle}%'
+		</if>
+		<if test="condition.createUserName != null">
+			and U.Username like '%${condition.createUserName}%'
+		</if>
+		<if test="page != null">
+			order by ${page.sortField} ${page.sortType}
+			limit ${page.start}, ${page.pageSize}
+		</if>
+	</select>
 
 	<insert id="insert" useGeneratedKeys="true" keyProperty="commentID" parameterType="com.iidooo.cms.model.po.CmsComment">
-		insert into CMS_COMMENT
+		insert into cms_comment
 		<trim prefix="(" suffix=")" suffixOverrides=",">
 			<if test="contentID != null">
 				ContentID,
@@ -134,7 +224,7 @@
 			<if test="parentID != null">
 				#{parentID,jdbcType=INTEGER},
 			</if>
-			(select ifnull(Max(Sequence),0) from CMS_COMMENT C where C.ContentID = #{contentID,jdbcType=INTEGER} and C.IsDelete = 0) + 1,
+			(select ifnull(Max(Sequence),0) from cms_comment C where C.ContentID = #{contentID,jdbcType=INTEGER} and C.IsDelete = 0) + 1,
 			<if test="comment != null">
 				#{comment,jdbcType=LONGVARCHAR},
 			</if>
@@ -156,8 +246,10 @@
 			0,1
 		</trim>
 	</insert>
+	
+	<!-- 更新CmsComment数据 -->
 	<update id="updateByCommentID" parameterType="com.iidooo.cms.model.po.CmsComment">
-		update CMS_COMMENT
+		update cms_comment
 		<set>
 			<if test="contentID != null">
 				ContentID = #{contentID,jdbcType=INTEGER},
@@ -171,15 +263,23 @@
 			<if test="remarks != null">
 				Remarks = #{remarks,jdbcType=VARCHAR},
 			</if>
-			<if test="updateTime != null">
-				UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
-			</if>
 			<if test="updateUserID != null">
 				UpdateUserID = #{updateUserID,jdbcType=INTEGER},
 			</if>
-			<if test="version != null">
-				Version = Version + 1,
+			Version = Version + 1
+		</set>
+		where CommentID = #{commentID,jdbcType=INTEGER}
+	</update>
+	
+	<!-- 逻辑删除 -->
+	<update id="deleteByCommentID" parameterType="com.iidooo.cms.model.po.CmsComment">
+		update cms_comment
+		<set>			
+			<if test="updateUserID != null">
+				UpdateUserID = #{updateUserID,jdbcType=INTEGER},
 			</if>
+			Version = Version + 1,
+			IsDelete = 1
 		</set>
 		where CommentID = #{commentID,jdbcType=INTEGER}
 	</update>

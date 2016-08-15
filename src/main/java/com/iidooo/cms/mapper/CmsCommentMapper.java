@@ -5,11 +5,10 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import com.iidooo.cms.model.po.CmsComment;
+import com.iidooo.cms.model.vo.SearchCondition;
 import com.iidooo.core.model.Page;
 
 public interface CmsCommentMapper {
-    int deleteByPrimaryKey(Integer commentID);
-
     /**
      * 插入CmsComment数据
      * @param cmsComment 该条记录被插入
@@ -57,10 +56,32 @@ public interface CmsCommentMapper {
     List<CmsComment> selectByUserID(@Param("userID")Integer userID, @Param("page")Page page);
     
     /**
+     * 根据条件查询评论一览数目
+     * @param condition 条件
+     * @return 所获得的评论
+     */
+    int selectCountForSearch(SearchCondition condition);
+    
+    /**
+     * 检索评论一览
+     * @param condition 检索条件
+     * @param page 翻页对象
+     * @return 所获的的评论一览
+     */
+    List<CmsComment> selectForSearch(@Param("condition")SearchCondition condition, @Param("page")Page page);
+    
+    /**
      * 更新CmsComment数据
      * @param 要更新的 CmsComment 对象内容
      * @return 更新所影响的行
      */
     int updateByCommentID(CmsComment cmsComment);
+    
+    /**
+     * 逻辑删除
+     * @param cmsComment 要删除的CmsComment 对象内容
+     * @return 删除所影像的行数
+     */
+    int deleteByCommentID(CmsComment cmsComment);
     
 }

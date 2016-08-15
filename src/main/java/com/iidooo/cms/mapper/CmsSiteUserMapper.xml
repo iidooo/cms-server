@@ -67,6 +67,14 @@
     where RelID = #{relID,jdbcType=INTEGER}
   </select>
   
+  <!-- 通过站点ID和用户ID获得站点用户对象 -->
+  <select id="selectBySiteUserID" resultMap="BaseResultMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from cms_site_user SU
+    where SU.SiteID = #{siteID,jdbcType=INTEGER} and SU.UserID = #{userID,jdbcType=INTEGER}
+  </select>
+  
   <!-- 检索站点的用户数量 -->
   <select id="selectCountForSearch" resultType="java.lang.Integer" parameterType="com.iidooo.cms.model.vo.SearchCondition">
 	select count(SU.RelID)
@@ -241,54 +249,23 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.iidooo.cms.model.po.CmsSiteUser" >
+  
+  <!-- 通过站点ID和用户ID更新站点用户信息 -->
+  <update id="updateBySiteUserID" parameterType="com.iidooo.cms.model.po.CmsSiteUser" >
     update cms_site_user
     <set >
-      <if test="siteID != null" >
-        SiteID = #{siteID,jdbcType=INTEGER},
-      </if>
-      <if test="userID != null" >
-        UserID = #{userID,jdbcType=INTEGER},
-      </if>
       <if test="role != null" >
         Role = #{role,jdbcType=VARCHAR},
       </if>
       <if test="remarks != null" >
         Remarks = #{remarks,jdbcType=VARCHAR},
       </if>
-      <if test="updateTime != null" >
-        UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
-      </if>
       <if test="updateUserID != null" >
         UpdateUserID = #{updateUserID,jdbcType=INTEGER},
       </if>
-      <if test="createTime != null" >
-        CreateTime = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="createUserID != null" >
-        CreateUserID = #{createUserID,jdbcType=INTEGER},
-      </if>
-      <if test="isDelete != null" >
-        IsDelete = #{isDelete,jdbcType=INTEGER},
-      </if>
-      <if test="version != null" >
-        Version = #{version,jdbcType=INTEGER},
-      </if>
+        Version = Version + 1
     </set>
-    where RelID = #{relID,jdbcType=INTEGER}
+    where SiteID = #{siteID,jdbcType=INTEGER} and UserID = #{userID,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.iidooo.cms.model.po.CmsSiteUser" >
-    update cms_site_user
-    set SiteID = #{siteID,jdbcType=INTEGER},
-      UserID = #{userID,jdbcType=INTEGER},
-      Role = #{role,jdbcType=VARCHAR},
-      Remarks = #{remarks,jdbcType=VARCHAR},
-      UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
-      UpdateUserID = #{updateUserID,jdbcType=INTEGER},
-      CreateTime = #{createTime,jdbcType=TIMESTAMP},
-      CreateUserID = #{createUserID,jdbcType=INTEGER},
-      IsDelete = #{isDelete,jdbcType=INTEGER},
-      Version = #{version,jdbcType=INTEGER}
-    where RelID = #{relID,jdbcType=INTEGER}
-  </update>
+
 </mapper>

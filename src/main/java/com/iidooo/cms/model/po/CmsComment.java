@@ -2,13 +2,16 @@ package com.iidooo.cms.model.po;
 
 import java.util.Date;
 
-import com.iidooo.cms.model.vo.SecurityUserInfo;
 import com.iidooo.core.model.po.SecurityUser;
 
 public class CmsComment {
     private Integer commentID;
 
+    private Integer siteID;
+
     private Integer contentID;
+
+    private CmsContent content;
 
     private Integer parentID;
 
@@ -21,6 +24,8 @@ public class CmsComment {
     private Date createTime;
 
     private Integer createUserID;
+
+    private SecurityUser createUser;
 
     private Date updateTime;
 
@@ -38,12 +43,28 @@ public class CmsComment {
         this.commentID = commentID;
     }
 
+    public Integer getSiteID() {
+        return siteID;
+    }
+
+    public void setSiteID(Integer siteID) {
+        this.siteID = siteID;
+    }
+
     public Integer getContentID() {
         return contentID;
     }
 
     public void setContentID(Integer contentID) {
         this.contentID = contentID;
+    }
+
+    public CmsContent getContent() {
+        return content;
+    }
+
+    public void setContent(CmsContent content) {
+        this.content = content;
     }
 
     public Integer getParentID() {
@@ -94,6 +115,14 @@ public class CmsComment {
         this.createUserID = createUserID;
     }
 
+    public SecurityUser getCreateUser() {
+        return createUser;
+    }
+
+    public void setCreateUser(SecurityUser createUser) {
+        this.createUser = createUser;
+    }
+
     public Date getUpdateTime() {
         return updateTime;
     }
@@ -124,15 +153,5 @@ public class CmsComment {
 
     public void setVersion(Integer version) {
         this.version = version;
-    }
-
-    private SecurityUser createUser;
-
-    public SecurityUser getCreateUser() {
-        return createUser;
-    }
-
-    public void setCreateUser(SecurityUser createUser) {
-        this.createUser = createUser;
     }
 }

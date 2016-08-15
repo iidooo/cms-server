@@ -22,4 +22,19 @@ public interface SiteUserService {
      * @return 用户一览
      */
     List<CmsSiteUser> getSiteUserList(SearchCondition condition, Page page);
+    
+    /**
+     * 通过站点ID和用户ID获得用户信息
+     * @param siteID 站点ID
+     * @param userID 用户ID
+     * @return 站点用户信息
+     */
+    CmsSiteUser getSiteUser(Integer siteID, Integer userID);
+    
+    /**
+     * 更新站点用户对象
+     * @param siteUser 站点用户信息
+     * @return 更新后的站点用户对象
+     */
+    CmsSiteUser updateSiteUser(CmsSiteUser siteUser);
 }

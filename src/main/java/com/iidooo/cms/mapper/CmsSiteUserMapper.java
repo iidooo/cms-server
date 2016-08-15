@@ -3,7 +3,6 @@ package com.iidooo.cms.mapper;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
-import org.springframework.messaging.handler.annotation.Payload;
 
 import com.iidooo.cms.model.po.CmsSiteUser;
 import com.iidooo.cms.model.vo.SearchCondition;
@@ -17,6 +16,14 @@ public interface CmsSiteUserMapper {
     int insertSelective(CmsSiteUser record);
 
     CmsSiteUser selectByPrimaryKey(Integer relID);
+    
+    /**
+     * 通过站点ID和用户ID获得站点用户对象
+     * @param siteID
+     * @param userID
+     * @return 所获的的用户信息
+     */
+    CmsSiteUser selectBySiteUserID(@Param("siteID")Integer siteID, @Param("userID")Integer userID);
     
     /**
      * 检索站点的用户数量
@@ -34,7 +41,10 @@ public interface CmsSiteUserMapper {
      */
     List<CmsSiteUser> selectForSearch(@Param("condition")SearchCondition condition, @Param("page")Page page);
 
-    int updateByPrimaryKeySelective(CmsSiteUser record);
-
-    int updateByPrimaryKey(CmsSiteUser record);
+    /**
+     * 通过站点ID和用户ID更新站点用户信息
+     * @param siteUser 站点用户对象
+     * @return 更新所影响的行
+     */
+    int updateBySiteUserID(CmsSiteUser siteUser);
 }

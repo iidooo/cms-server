@@ -19,10 +19,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.iidooo.cms.model.po.CmsSiteUser;
 import com.iidooo.cms.model.vo.SearchCondition;
 import com.iidooo.cms.service.SiteUserService;
+import com.iidooo.core.constant.MessageConstant;
 import com.iidooo.core.constant.RegularConstant;
 import com.iidooo.core.enums.ResponseStatus;
 import com.iidooo.core.model.Page;
 import com.iidooo.core.model.ResponseResult;
+import com.iidooo.core.model.po.SecurityUser;
 import com.iidooo.core.util.PageUtil;
 import com.iidooo.core.util.StringUtil;
 import com.iidooo.core.util.ValidateUtil;
@@ -155,6 +157,80 @@ public class SiteUserController {
             result.setStatus(ResponseStatus.OK.getCode());
             result.setData(data);
             
+        } catch (Exception e) {
+            logger.fatal(e);
+            result.checkException(e);
+        }
+        return result;
+    }
+    
+    @ResponseBody
+    @RequestMapping(value = "/admin/getSiteUser", method = RequestMethod.POST)
+    public ResponseResult getSiteUser(HttpServletRequest request, HttpServletResponse response) {
+        ResponseResult result = new ResponseResult();
+        try {
+            String siteID = request.getParameter("siteID");
+            String userID = request.getParameter("userID");
+            
+            result.checkFieldRequired("siteID", siteID);
+            result.checkFieldInteger("siteID", siteID);
+            result.checkFieldRequired("userID", userID);
+            result.checkFieldInteger("userID", userID);
+            if (result.getMessages().size() > 0) {
+                result.setStatus(ResponseStatus.ValidateFailed.getCode());
+                return result;
+            }
+
+            CmsSiteUser siteUser = this.siteUserService.getSiteUser(Integer.parseInt(siteID), Integer.parseInt(userID));
+            if (siteUser == null) {
+                result.setStatus(ResponseStatus.QueryEmpty.getCode());
+            } else {
+                result.setStatus(ResponseStatus.OK.getCode());
+                result.setData(siteUser);
+            }
+
+        } catch (Exception e) {
+            logger.fatal(e);
+            result.checkException(e);
+        }
+        return result;
+    }
+    
+    @ResponseBody
+    @RequestMapping(value = "/admin/updateSiteUser", method = RequestMethod.POST)
+    public ResponseResult updateSiteUser(HttpServletRequest request, HttpServletResponse response) {
+        ResponseResult result = new ResponseResult();
+        try {
+            String siteID = request.getParameter("siteID");
+            String userID = request.getParameter("userID");
+            String operatorID = request.getParameter("operatorID");
+            
+            result.checkFieldRequired("operatorID", operatorID);
+            result.checkFieldInteger("operatorID", operatorID);
+            result.checkFieldRequired("siteID", siteID);
+            result.checkFieldInteger("siteID", siteID);
+            result.checkFieldRequired("userID", userID);
+            result.checkFieldInteger("userID", userID);
+            if (result.getMessages().size() > 0) {
+                result.setStatus(ResponseStatus.ValidateFailed.getCode());
+                return result;
+            }
+
+            String role = request.getParameter("role");
+            
+            CmsSiteUser siteUser = new CmsSiteUser();
+            siteUser.setSiteID(Integer.parseInt(siteID));
+            siteUser.setUserID(Integer.parseInt(userID));
+            siteUser.setRole(role);
+            siteUser.setUpdateUserID(Integer.parseInt(operatorID));
+            siteUser = siteUserService.updateSiteUser(siteUser);
+            if (siteUser == null) {
+                result.setStatus(ResponseStatus.UpdateFailed.getCode());
+            } else {
+                result.setStatus(ResponseStatus.OK.getCode());
+                result.setData(siteUser);
+            }
+
         } catch (Exception e) {
             logger.fatal(e);
             result.checkException(e);

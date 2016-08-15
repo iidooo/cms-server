@@ -16,6 +16,7 @@ import com.iidooo.cms.mapper.CmsContentMapper;
 import com.iidooo.cms.model.po.CmsComment;
 import com.iidooo.cms.model.po.CmsCommentNotice;
 import com.iidooo.cms.model.po.CmsContent;
+import com.iidooo.cms.model.vo.SearchCondition;
 import com.iidooo.cms.service.CommentService;
 import com.iidooo.core.mapper.SecurityUserMapper;
 import com.iidooo.core.model.Page;
@@ -34,7 +35,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Autowired
     private CmsContentMapper cmsContentMapper;
-    
+
     @Autowired
     private SecurityUserMapper securityUserMapper;
 
@@ -64,13 +65,35 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CmsComment getCommentByID(Integer commentID) {
+        CmsComment result = null;
         try {
-            CmsComment result = cmsCommentMapper.selectByCommentID(commentID);
-            return result;
+            result = cmsCommentMapper.selectByCommentID(commentID);
         } catch (Exception e) {
             logger.fatal(e);
-            throw e;
         }
+        return result;
+    }
+
+    @Override
+    public int getCommentListCount(SearchCondition condition) {
+        int result = 0;
+        try {
+            result = cmsCommentMapper.selectCountForSearch(condition);
+        } catch (Exception e) {
+            logger.fatal(e);
+        }
+        return result;
+    }
+
+    @Override
+    public List<CmsComment> getCommentList(SearchCondition condition, Page page) {
+        List<CmsComment> result = new ArrayList<CmsComment>();
+        try {
+            result = cmsCommentMapper.selectForSearch(condition, page);
+        } catch (Exception e) {
+            logger.fatal(e);
+        }
+        return result;
     }
 
     @Override
@@ -104,7 +127,7 @@ public class CommentServiceImpl implements CommentService {
             for (SecurityUser item : administrators) {
                 adminIDMap.put(item.getUserID(), item);
             }
-            
+
             // 创建评论和该条内容的创建者不是同一个人的话，把这个评论推送给内容创建者
             if (cmsContent != null) {
                 List<CmsComment> cmsCommentList = cmsCommentMapper.selectByContentID(cmsContent.getContentID(), null);
@@ -114,8 +137,7 @@ public class CommentServiceImpl implements CommentService {
                 // 评论者自己先不用受到通知
                 noticedUserList.add(cmsComment.getCreateUserID());
                 // 如果不是内容创建者自己的评论，那么先给内容创建者发一条通知推送
-                if (!adminIDMap.containsKey(cmsContent.getCreateUserID()) && 
-                        !cmsContent.getCreateUserID().equals(cmsComment.getCreateUserID())) {
+                if (!adminIDMap.containsKey(cmsContent.getCreateUserID()) && !cmsContent.getCreateUserID().equals(cmsComment.getCreateUserID())) {
                     CmsCommentNotice commentNotice = new CmsCommentNotice();
                     commentNotice.setUserID(cmsContent.getCreateUserID());
                     commentNotice.setContentID(cmsComment.getContentID());
@@ -139,12 +161,12 @@ public class CommentServiceImpl implements CommentService {
                     if (noticedUserList.contains(item.getCreateUserID())) {
                         continue;
                     }
-                    
+
                     // 管理员不被推送
-                    if (adminIDMap.containsKey(item.getCreateUserID())){
+                    if (adminIDMap.containsKey(item.getCreateUserID())) {
                         continue;
                     }
-                    
+
                     CmsCommentNotice commentNotice = new CmsCommentNotice();
                     commentNotice.setUserID(item.getCreateUserID());
                     commentNotice.setContentID(cmsComment.getContentID());
@@ -172,8 +194,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CmsComment updateComment(CmsComment cmsComment) {
         try {
-            cmsComment.setUpdateUserID(cmsComment.getCreateUserID());
-            cmsComment.setUpdateTime(new Date());
             if (cmsCommentMapper.updateByCommentID(cmsComment) <= 0) {
                 return null;
             }
@@ -182,7 +202,21 @@ public class CommentServiceImpl implements CommentService {
             return cmsComment;
         } catch (Exception e) {
             logger.fatal(e);
-            throw e;
+            return null;
         }
     }
+
+    @Override
+    public boolean deleteComment(CmsComment comment) {
+        try {
+            if(cmsCommentMapper.deleteByCommentID(comment) <= 0){
+                return false;
+            }
+            return true;
+        } catch (Exception e) {
+            logger.fatal(e);
+            return false;
+        }
+    }
+
 }

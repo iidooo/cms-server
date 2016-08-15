@@ -24,6 +24,8 @@ public class SearchCondition {
     
     private String userName;
     
+    private String createUserName;
+    
     private String sex;
     
     private String mobile;
@@ -31,6 +33,8 @@ public class SearchCondition {
     private String email;
     
     private String weixinID;
+    
+    private String comment;
     
     private List<String> roles;
     
@@ -102,6 +106,14 @@ public class SearchCondition {
         this.createUserID = createUserID;
     }
 
+    public String getCreateUserName() {
+        return createUserName;
+    }
+
+    public void setCreateUserName(String createUserName) {
+        this.createUserName = createUserName;
+    }
+
     public String getLoginID() {
         return loginID;
     }
@@ -148,6 +160,14 @@ public class SearchCondition {
 
     public void setWeixinID(String weixinID) {
         this.weixinID = weixinID;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
     public List<String> getRoles() {

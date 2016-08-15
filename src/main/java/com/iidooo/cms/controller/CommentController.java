@@ -1,7 +1,9 @@
 package com.iidooo.cms.controller;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.iidooo.cms.enums.TableName;
 import com.iidooo.cms.model.po.CmsComment;
 import com.iidooo.cms.model.po.CmsContent;
+import com.iidooo.cms.model.vo.SearchCondition;
 import com.iidooo.cms.service.CmsCommentNoticeService;
 import com.iidooo.cms.service.CommentService;
 import com.iidooo.cms.service.ContentService;
@@ -32,6 +35,7 @@ import com.iidooo.core.model.po.SecurityUser;
 import com.iidooo.core.service.HisOperatorService;
 import com.iidooo.core.service.SecurityUserService;
 import com.iidooo.core.util.DateUtil;
+import com.iidooo.core.util.PageUtil;
 import com.iidooo.core.util.StringUtil;
 import com.iidooo.core.util.ValidateUtil;
 
@@ -39,7 +43,7 @@ import com.iidooo.core.util.ValidateUtil;
 public class CommentController {
 
     private static final Logger logger = Logger.getLogger(CommentController.class);
-    
+
     @Autowired
     private CommentService commentService;
 
@@ -119,6 +123,99 @@ public class CommentController {
                     cmsCommentNoticeService.deleteCommentNoticeList(operatorID, contentID);
                 }
             }
+
+        } catch (Exception e) {
+            logger.fatal(e);
+            result.checkException(e);
+        }
+        return result;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/admin/getComment", method = RequestMethod.POST)
+    public ResponseResult getComment(HttpServletRequest request, HttpServletResponse response) {
+        ResponseResult result = new ResponseResult();
+        try {
+            String commentID = request.getParameter("commentID");
+            result.checkFieldRequired("commentID", commentID);
+            result.checkFieldInteger("commentID", commentID);
+            if (result.getMessages().size() > 0) {
+                // 验证失败，返回message
+                result.setStatus(ResponseStatus.Failed.getCode());
+                return result;
+            }
+
+            CmsComment comment = commentService.getCommentByID(Integer.parseInt(commentID));
+
+            if (comment == null) {
+                result.setStatus(ResponseStatus.QueryEmpty.getCode());
+                return result;
+            }
+
+            // 返回找到的内容对象
+            result.setStatus(ResponseStatus.OK.getCode());
+            result.setData(comment);
+
+        } catch (Exception e) {
+            logger.fatal(e);
+            result.checkException(e);
+        }
+        return result;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/admin/searchCommentList", method = RequestMethod.POST)
+    public ResponseResult searchCommentList(HttpServletRequest request, HttpServletResponse response) {
+        ResponseResult result = new ResponseResult();
+        try {
+            String siteID = request.getParameter("siteID");
+            String comment = request.getParameter("comment");
+            String contentTitle = request.getParameter("contentTitle");
+            String createUserName = request.getParameter("createUserName");
+
+            result.checkFieldRequired("siteID", siteID);
+            result.checkFieldInteger("siteID", siteID);
+            if (result.getMessages().size() > 0) {
+                // 验证失败，返回message
+                result.setStatus(ResponseStatus.Failed.getCode());
+                return result;
+            }
+
+            SearchCondition condition = new SearchCondition();
+            condition.setSiteID(Integer.parseInt(siteID));
+            condition.setComment(comment);
+            condition.setContentTitle(contentTitle);
+            condition.setCreateUserName(createUserName);
+
+            int recordSum = commentService.getCommentListCount(condition);
+
+            Page page = new Page();
+            String sortField = request.getParameter("sortField");
+            if (StringUtil.isNotBlank(sortField)) {
+                page.setSortField(sortField);
+            }
+            String sortType = request.getParameter("sortType");
+            if (StringUtil.isNotBlank(sortType)) {
+                page.setSortType(sortType);
+            }
+            String pageSize = request.getParameter("pageSize");
+            if (StringUtil.isNotBlank(pageSize) && ValidateUtil.isMatch(pageSize, RegularConstant.REGEX_NUMBER)) {
+                page.setPageSize(Integer.parseInt(pageSize));
+            }
+            String currentPage = request.getParameter("currentPage");
+            if (StringUtil.isNotBlank(currentPage) && ValidateUtil.isMatch(currentPage, RegularConstant.REGEX_NUMBER)
+                    && Integer.parseInt(currentPage) > 0) {
+                page.setCurrentPage(Integer.parseInt(currentPage));
+            }
+            page = PageUtil.executePage(recordSum, page);
+
+            Map<String, Object> data = new HashMap<String, Object>();
+            List<CmsComment> commentList = commentService.getCommentList(condition, page);
+            data.put("page", page);
+            data.put("commentList", commentList);
+            // 返回找到的内容对象
+            result.setStatus(ResponseStatus.OK.getCode());
+            result.setData(data);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -256,8 +353,7 @@ public class CommentController {
                 cmsComment = existComment;
                 result.setStatus(ResponseStatus.OK.getCode());
                 result.setData(cmsComment);
-            }
-            else {
+            } else {
                 if (!this.commentService.createComment(cmsComment)) {
                     result.setStatus(ResponseStatus.InsertFailed.getCode());
                 } else {
@@ -269,7 +365,7 @@ public class CommentController {
                     // 更新浏览记录
                     hisOperatorService.createHisOperator(TableName.CMS_COMMENT.toString(), cmsComment.getCommentID(), request);
                 }
-            }          
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -279,28 +375,20 @@ public class CommentController {
         return result;
     }
 
-    @RequestMapping(value = "/updateComment", method = RequestMethod.POST)
-    public @ResponseBody ResponseResult updateComment(HttpServletRequest request, HttpServletResponse response) {
+    @ResponseBody
+    @RequestMapping(value = { "/updateComment", "/admin/updateComment" }, method = RequestMethod.POST)
+    public ResponseResult updateComment(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
         try {
-            // 解析获得传入的参数
-            // 必填参数
             String commentID = request.getParameter("commentID");
             String comment = request.getParameter("comment");
+            String operatorID = request.getParameter("operatorID");
 
-            if (StringUtil.isBlank(commentID)) {
-                Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "commentID");
-                result.getMessages().add(message);
-            } else if (ValidateUtil.isMatch(commentID, RegularConstant.REGEX_NUMBER)) {
-                Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "commentID");
-                result.getMessages().add(message);
-            }
-
-            if (StringUtil.isBlank(comment)) {
-                Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "comment");
-                result.getMessages().add(message);
-            }
-
+            result.checkFieldRequired("commentID", commentID);
+            result.checkFieldInteger("commentID", commentID);
+            result.checkFieldRequired("comment", comment);
+            result.checkFieldRequired("operatorID", operatorID);
+            result.checkFieldInteger("operatorID", operatorID);
             if (result.getMessages().size() > 0) {
                 // 验证失败，返回message
                 result.setStatus(ResponseStatus.Failed.getCode());
@@ -310,6 +398,7 @@ public class CommentController {
             CmsComment cmsComment = new CmsComment();
             cmsComment.setComment(comment);
             cmsComment.setCommentID(Integer.parseInt(commentID));
+            cmsComment.setUpdateUserID(Integer.parseInt(operatorID));
             cmsComment = this.commentService.updateComment(cmsComment);
             if (cmsComment == null) {
                 result.setStatus(ResponseStatus.UpdateFailed.getCode());
@@ -318,11 +407,41 @@ public class CommentController {
                 result.setData(cmsComment);
             }
 
-            // 更新浏览记录
-            hisOperatorService.createHisOperator(TableName.CMS_COMMENT.toString(), cmsComment.getCommentID(), request);
+        } catch (Exception e) {
+            logger.fatal(e);
+            result.checkException(e);
+        }
+        return result;
+    }
+
+    @ResponseBody
+    @RequestMapping(value = { "/admin/deleteComment" }, method = RequestMethod.POST)
+    public ResponseResult deleteComment(HttpServletRequest request, HttpServletResponse response) {
+        ResponseResult result = new ResponseResult();
+        try {
+            String commentID = request.getParameter("commentID");
+            String operatorID = request.getParameter("operatorID");
+
+            result.checkFieldRequired("commentID", commentID);
+            result.checkFieldInteger("commentID", commentID);
+            result.checkFieldRequired("operatorID", operatorID);
+            result.checkFieldInteger("operatorID", operatorID);
+            if (result.getMessages().size() > 0) {
+                // 验证失败，返回message
+                result.setStatus(ResponseStatus.Failed.getCode());
+                return result;
+            }
+
+            CmsComment comment = new CmsComment();
+            comment.setCommentID(Integer.parseInt(commentID));
+            comment.setUpdateUserID(Integer.parseInt(operatorID));
+            if (this.commentService.deleteComment(comment)) {
+                result.setStatus(ResponseStatus.OK.getCode());
+            } else {
+                result.setStatus(ResponseStatus.UpdateFailed.getCode());
+            }
 
         } catch (Exception e) {
-            e.printStackTrace();
             logger.fatal(e);
             result.checkException(e);
         }
