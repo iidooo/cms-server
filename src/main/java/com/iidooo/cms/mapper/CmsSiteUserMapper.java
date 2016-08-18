@@ -11,9 +11,12 @@ import com.iidooo.core.model.Page;
 public interface CmsSiteUserMapper {
     int deleteByPrimaryKey(Integer relID);
 
-    int insert(CmsSiteUser record);
-
-    int insertSelective(CmsSiteUser record);
+    /**
+     * 插入站点用户对象
+     * @param siteUser 站点用户对象
+     * @return 所影响的行数
+     */
+    int insert(CmsSiteUser siteUser);
 
     CmsSiteUser selectByPrimaryKey(Integer relID);
     

@@ -81,7 +81,7 @@
     select 
     <include refid="Owner_Column_List" />
     from cms_site_user U
-    where U.SiteID = #{siteID,jdbcType=INTEGER}
+    where U.SiteID = #{siteID,jdbcType=INTEGER} and U.Role in ('1','2');
   </select>
 	 
   <!-- 通过站点ID获取站点对象 -->
@@ -90,6 +90,14 @@
     <include refid="Base_Column_List" />
     from cms_site S
     where S.IsDelete = 0 and SiteID = #{siteID,jdbcType=INTEGER}
+  </select>
+  
+  <!-- 通过站点Code获取站点对象 -->
+  <select id="selectBySiteCode" resultMap="BaseResultMap" parameterType="java.lang.String">
+  	select 
+    <include refid="Base_Column_List" />
+    from cms_site S
+    where S.IsDelete = 0 and SiteCode = #{siteCode,jdbcType=VARCHAR}
   </select>
   
   <!-- 查询获取拥有者的站点列表 -->
@@ -106,22 +114,11 @@
     delete from cms_site
     where SiteID = #{siteID,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.iidooo.cms.model.po.CmsSite" >
-    insert into cms_site (SiteID, SiteCode, SiteName, 
-      SiteURL, Remarks, UpdateTime, 
-      UpdateUserID, CreateTime, CreateUserID, 
-      IsDelete, Version)
-    values (#{siteID,jdbcType=INTEGER}, #{siteCode,jdbcType=VARCHAR}, #{siteName,jdbcType=VARCHAR}, 
-      #{siteURL,jdbcType=VARCHAR}, #{remarks,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{updateUserID,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{createUserID,jdbcType=INTEGER}, 
-      #{isDelete,jdbcType=INTEGER}, #{version,jdbcType=INTEGER})
-  </insert>
-  <insert id="insertSelective" parameterType="com.iidooo.cms.model.po.CmsSite" >
+
+  <!-- 插入站点数据 -->
+  <insert id="insert" useGeneratedKeys="true" keyProperty="siteID" parameterType="com.iidooo.cms.model.po.CmsSite" >
     insert into cms_site
     <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="siteID != null" >
-        SiteID,
-      </if>
       <if test="siteCode != null" >
         SiteCode,
       </if>
@@ -134,9 +131,6 @@
       <if test="remarks != null" >
         Remarks,
       </if>
-      <if test="updateTime != null" >
-        UpdateTime,
-      </if>
       <if test="updateUserID != null" >
         UpdateUserID,
       </if>
@@ -146,17 +140,8 @@
       <if test="createUserID != null" >
         CreateUserID,
       </if>
-      <if test="isDelete != null" >
-        IsDelete,
-      </if>
-      <if test="version != null" >
-        Version,
-      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="siteID != null" >
-        #{siteID,jdbcType=INTEGER},
-      </if>
       <if test="siteCode != null" >
         #{siteCode,jdbcType=VARCHAR},
       </if>
@@ -169,9 +154,6 @@
       <if test="remarks != null" >
         #{remarks,jdbcType=VARCHAR},
       </if>
-      <if test="updateTime != null" >
-        #{updateTime,jdbcType=TIMESTAMP},
-      </if>
       <if test="updateUserID != null" >
         #{updateUserID,jdbcType=INTEGER},
       </if>
@@ -180,12 +162,6 @@
       </if>
       <if test="createUserID != null" >
         #{createUserID,jdbcType=INTEGER},
-      </if>
-      <if test="isDelete != null" >
-        #{isDelete,jdbcType=INTEGER},
-      </if>
-      <if test="version != null" >
-        #{version,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>

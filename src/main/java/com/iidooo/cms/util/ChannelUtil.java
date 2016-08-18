@@ -20,9 +20,6 @@ public class ChannelUtil {
         List<TreeNode> result = new ArrayList<TreeNode>();
         try {
             // Key: channelID
-            // Value: CmsChannel
-            Map<Integer, CmsChannel> channelMap = new HashMap<Integer, CmsChannel>();
-            // Key: channelID
             // Value: TreeNode
             Map<Integer, TreeNode> treeNodeMap = new HashMap<Integer, TreeNode>();
             
@@ -34,17 +31,14 @@ public class ChannelUtil {
             treeNodeMap.put(0, root);
             
             for (CmsChannel item : channelList) {
-                channelMap.put(item.getChannelID(), item);
-
                 TreeNode treeNode = new TreeNode();
                 treeNode.setText(item.getChannelName());
                 treeNode.setData(item);
                 treeNodeMap.put(item.getChannelID(), treeNode);
             }
 
-            for (Integer channelID : channelMap.keySet()) {
-                CmsChannel channel = channelMap.get(channelID);
-                TreeNode treeNode = treeNodeMap.get(channelID);
+            for (CmsChannel channel : channelList) {
+                TreeNode treeNode = treeNodeMap.get(channel.getChannelID());
 
                 TreeNode parentTreeNode = treeNodeMap.get(channel.getParentID());
                 if (parentTreeNode != null) {

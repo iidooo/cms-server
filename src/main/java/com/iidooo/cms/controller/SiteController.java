@@ -1,5 +1,6 @@
 package com.iidooo.cms.controller;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,6 +25,56 @@ public class SiteController {
     @Autowired
     private SiteService siteService;
 
+
+    @ResponseBody
+    @RequestMapping(value = { "/admin/createSite" }, method = RequestMethod.POST)
+    public ResponseResult createSite(HttpServletRequest request, HttpServletResponse response) {
+        ResponseResult result = new ResponseResult();
+        try {
+            String siteCode = request.getParameter("siteCode");
+            String operatorID = request.getParameter("operatorID");
+            result.checkFieldRequired("siteCode", siteCode);
+            result.checkFieldEnglish("siteCode", siteCode);
+            result.checkFieldRequired("operatorID", operatorID);
+            result.checkFieldInteger("operatorID", operatorID);
+            if (result.getMessages().size() > 0) {
+                result.setStatus(ResponseStatus.Failed.getCode());
+                return result;
+            }
+            
+            // 判断站点Code是否重复
+            if(siteService.getSiteByCode(siteCode) != null){
+                result.checkFieldUnique("siteCode", siteCode);
+                result.setStatus(ResponseStatus.DuplicateFailed.getCode());
+                return result;
+            }
+
+            String siteName = request.getParameter("siteName");
+            String siteURL = request.getParameter("siteURL");
+            String remarks = request.getParameter("remarks");
+            
+            CmsSite site = new CmsSite();
+            site.setSiteCode(siteCode);
+            site.setSiteName(siteName);
+            site.setSiteURL(siteURL);
+            site.setRemarks(remarks);
+            site.setCreateUserID(Integer.parseInt(operatorID));
+            site.setUpdateUserID(Integer.parseInt(operatorID));
+            site.setCreateTime(new Date());
+            site = siteService.createSite(site);
+            if (site == null) {
+                result.setStatus(ResponseStatus.Failed.getCode());
+            } else {
+                result.setStatus(ResponseStatus.OK.getCode());
+                result.setData(site);
+            }
+        } catch (Exception e) {
+            logger.fatal(e);
+            result.checkException(e);
+        }
+        return result;
+    }
+    
     @ResponseBody
     @RequestMapping(value = { "/admin/getSite" }, method = RequestMethod.POST)
     public ResponseResult getSite(HttpServletRequest request, HttpServletResponse response) {
