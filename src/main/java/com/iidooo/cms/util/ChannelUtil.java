@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.json.util.NewBeanInstanceStrategy;
-
 import org.apache.log4j.Logger;
 
 import com.iidooo.cms.model.po.CmsChannel;
@@ -23,13 +21,6 @@ public class ChannelUtil {
             // Value: TreeNode
             Map<Integer, TreeNode> treeNodeMap = new HashMap<Integer, TreeNode>();
             
-            TreeNode root = new TreeNode();
-            CmsChannel rootChannel = new CmsChannel();
-            rootChannel.setChannelID(0);
-            root.setText("root");
-            root.setData(rootChannel);
-            treeNodeMap.put(0, root);
-            
             for (CmsChannel item : channelList) {
                 TreeNode treeNode = new TreeNode();
                 treeNode.setText(item.getChannelName());
@@ -43,10 +34,10 @@ public class ChannelUtil {
                 TreeNode parentTreeNode = treeNodeMap.get(channel.getParentID());
                 if (parentTreeNode != null) {
                     parentTreeNode.getNodes().add(treeNode);
-                } 
+                } else {                    
+                    result.add(treeNode);
+                }
             }
-            
-            result.add(root);
 
         } catch (Exception e) {
             logger.fatal(e);
