@@ -285,6 +285,38 @@
 		</if>
 		order by C2.CreateTime desc limit ${page.start}, ${page.pageSize}) limit ${page.start}, ${page.pageSize}
 	</select>
+	
+	
+	<!-- 根据栏目路径查询获得内容一览数目 -->
+	<select id="selectContentListCount" resultType="java.lang.Integer">
+		select
+		count(C.ContentID)
+		from cms_content_news N
+		join cms_content C
+		join cms_channel L 
+		join cms_site S on 
+		C.IsDelete = 0 and N.ContentID = C.ContentID and C.Status = '1' and L.IsDelete = 0 and 
+		C.ChannelID = L.ChannelID and 
+		S.IsDelete = 0 and S.SiteID = L.SiteID
+		and S.SiteCode = #{channel.site.siteCode,jdbcType=VARCHAR}
+		and L.ChannelPath =	#{channel.channelPath,jdbcType=VARCHAR}
+	</select>
+
+	<!-- 根据栏目路径查询获得内容一览 -->
+	<select id="selectContentList" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from cms_content_news N
+		join cms_content C
+		join cms_channel L 
+		join cms_site S on
+		C.IsDelete = 0 and N.ContentID = C.ContentID and C.Status = '1' and L.IsDelete = 0 and 
+		C.ChannelID = L.ChannelID and 
+		S.IsDelete = 0 and S.SiteID = L.SiteID
+		and S.SiteCode = #{content.channel.site.siteCode,jdbcType=VARCHAR}
+		and L.ChannelPath =	#{content.channel.channelPath,jdbcType=VARCHAR}
+		order by C.StickyIndex desc, C.${page.sortField} ${page.sortType} limit ${page.start}, ${page.pageSize}
+	</select>
 
 	<delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
 		delete from cms_content_news

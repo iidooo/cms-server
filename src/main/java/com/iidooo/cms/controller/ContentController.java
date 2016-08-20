@@ -26,10 +26,7 @@ import com.iidooo.cms.model.vo.SearchCondition;
 import com.iidooo.cms.service.ContentService;
 import com.iidooo.cms.service.FavoriteService;
 import com.iidooo.core.constant.RegularConstant;
-import com.iidooo.core.enums.MessageLevel;
-import com.iidooo.core.enums.MessageType;
 import com.iidooo.core.enums.ResponseStatus;
-import com.iidooo.core.model.Message;
 import com.iidooo.core.model.Page;
 import com.iidooo.core.model.ResponseResult;
 import com.iidooo.core.service.DictItemService;
@@ -307,44 +304,28 @@ public class ContentController {
     }
 
     @ResponseBody
-    @RequestMapping(value = { "/getContent", "/admin/getContent" }, method = RequestMethod.POST)
+    @RequestMapping(value = { "/cms/getContent", "/cms/admin/getContent" }, method = RequestMethod.POST)
     public ResponseResult getContent(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
         try {
-            // 获取和验证字段
             String contentID = request.getParameter("contentID");
-            if (StringUtil.isBlank(contentID)) {
-                Message message = new Message(MessageType.FieldRequired.getCode(), MessageLevel.WARN, "contentID");
-                result.getMessages().add(message);
-            } else if (!ValidateUtil.isMatch(contentID, RegularConstant.REGEX_NUMBER)) {
-                Message message = new Message(MessageType.FieldNumberRequired.getCode(), MessageLevel.WARN, "contentID");
-                result.getMessages().add(message);
-            }
+            result.checkFieldRequired("contentID", contentID);
+            result.checkFieldInteger("contentID", contentID);
 
             if (result.getMessages().size() > 0) {
                 // 验证失败，返回message
                 result.setStatus(ResponseStatus.Failed.getCode());
                 return result;
             }
-
-            String userIDStr = request.getParameter("operatorID");
-            Integer operatorID = null;
-            if (StringUtil.isNotBlank(userIDStr) && ValidateUtil.isMatch(userIDStr, RegularConstant.REGEX_NUMBER)) {
-                operatorID = Integer.valueOf(userIDStr);
-            }
-
+            
             // 查询获得内容对象
-            CmsContent content = contentService.getContent(Integer.valueOf(contentID), operatorID);
+            CmsContent content = contentService.getContent(Integer.valueOf(contentID));
             if (content == null) {
                 result.setStatus(ResponseStatus.QueryEmpty.getCode());
                 return result;
             }
 
-            // 返回找到的内容对象
-            result.setStatus(ResponseStatus.OK.getCode());
-            result.setData(content);
-
-            if (request.getServletPath().equals("/getContent")) {
+            if (request.getServletPath().equals("/cms/getContent")) {
                 // 更新浏览记录
                 hisOperatorService.createHisOperator(TableName.CMS_CONTENT.toString(), content.getContentID(), request);
 
@@ -358,8 +339,11 @@ public class ContentController {
                 content.setPageViewCount(pvCount);
                 content.setUniqueVisitorCount(uvCount);
             }
-        } catch (Exception e) {
 
+            // 返回找到的内容对象
+            result.setStatus(ResponseStatus.OK.getCode());
+            result.setData(content);
+        } catch (Exception e) {
             logger.fatal(e);
             result.checkException(e);
         }
@@ -367,7 +351,7 @@ public class ContentController {
     }
 
     @ResponseBody
-    @RequestMapping(value = "/getContentList", method = RequestMethod.POST)
+    @RequestMapping(value = "/cms/getContentList", method = RequestMethod.POST)
     public ResponseResult getContentList(HttpServletRequest request, HttpServletResponse response) {
         ResponseResult result = new ResponseResult();
         try {

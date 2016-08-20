@@ -207,7 +207,11 @@ public class ContentServiceImpl implements ContentService {
     public int getContentListCount(CmsContent content) {
         int result = 0;
         try {
-            result = cmsContentDao.selectContentListCount(content);
+            if (ContentType.News.getCode().equals(content.getContentType())) {
+                result = cmsContentNewsDao.selectContentListCount(content);
+            } else {
+                result = cmsContentDao.selectContentListCount(content);
+            }
         } catch (Exception e) {
             logger.fatal(e);
             throw e;
@@ -219,7 +223,11 @@ public class ContentServiceImpl implements ContentService {
     public List<CmsContent> getContentList(CmsContent content, Page page) {
         List<CmsContent> result = new ArrayList<CmsContent>();
         try {
-            result = cmsContentDao.selectContentList(content, page);
+            if (ContentType.News.getCode().equals(content.getContentType())) {
+                result = cmsContentNewsDao.selectContentList(content, page);
+            } else {
+                result = cmsContentDao.selectContentList(content, page);
+            }
         } catch (Exception e) {
             logger.fatal(e);
             throw e;
